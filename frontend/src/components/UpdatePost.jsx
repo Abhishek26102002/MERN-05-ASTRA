@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
 const UpdatePost = (post) => {
+  // {console.log(post)}
   const navigate = useNavigate();
   const { updatePost } = PostStore();
   const { setuser } = UserStore();
@@ -73,7 +74,7 @@ const UpdatePost = (post) => {
      await updatePost(formData, post.post._id);
       // Close modal after successful submission
       document.getElementById("my_modal_4").close();
-      navigate(0); // Refreshes the current page
+      // navigate(0); // Refreshes the current page
       // toast.success("Refresh page to view update")
     } catch (error) {
       console.log("Error in create post:", error);

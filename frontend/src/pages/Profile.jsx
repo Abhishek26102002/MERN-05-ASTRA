@@ -11,7 +11,7 @@ const Profile = () => {
 
   useEffect(() => {
     setuser;
-  }, [setuser]);
+  }, []);
 
   const [selectedImg, setSelectedImage] = useState(null);
 

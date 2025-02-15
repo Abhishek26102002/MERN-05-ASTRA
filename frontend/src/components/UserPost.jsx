@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { EllipsisVertical } from "lucide-react";
 import UpdatePost from "./UpdatePost";
 import { PostStore } from "../ApiStore/PostStore";
@@ -7,12 +7,15 @@ import { Link } from "react-router-dom";
 
 const UserPost = (setPost) => {
   const { deletePost } = PostStore();
+  const { setuser } = UserStore();
 
-  const { setuser, checkAuth } = UserStore();
+  const [activePost, setActivePost] = useState(null); // Track which post is being updated
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  const openModal = (post) => {
+    setActivePost(post); // Set the active post when clicking "Update"
+    document.getElementById("my_modal_4").showModal();
+  };
+
   // setpost is accepting array
   const postss = setPost?.setpost || [];
 
@@ -36,7 +39,7 @@ const UserPost = (setPost) => {
                   ? post.title.slice(0, 27) + "..."
                   : post.title}
               </h3>
-              <p className="text-white text-sm">
+              <p className="hidden sm:flex text-white text-sm">
                 {post.blogText?.length > 87
                   ? post.blogText.slice(0, 87) + "..."
                   : post.blogText}
@@ -46,7 +49,7 @@ const UserPost = (setPost) => {
 
           {/* 3-Dots Icon */}
           {setuser?._id === post.createdBy || setuser?.is_Admin ? (
-            <div className="absolute top-2 right-2 text-black ">
+            <div key={post?._id} className="absolute top-2 right-2 text-black ">
               <div className="dropdown dropdown-end glass rounded-lg">
                 <EllipsisVertical
                   tabIndex={0}
@@ -54,38 +57,22 @@ const UserPost = (setPost) => {
                   className="m-1"
                   size={20}
                 />
-
                 <ul
                   tabIndex={0}
-                  className="-top-5 sm:top-10 menu dropdown-content bg-base-100 rounded-box z-[1] m-5  w-32 p-2 gap-4 shadow"
+                  className="-top-5 sm:top-10 menu dropdown-content bg-base-100 rounded-box z-[1] m-5 w-32 p-2 gap-4 shadow"
                 >
                   <li>
                     <button
                       className="btn btn-sm"
-                      onClick={() => {
-                        document.getElementById("my_modal_4").showModal();
-                      }}
+                      onClick={() => openModal(post)}
                     >
                       Update
                     </button>
-                    <dialog
-                      id="my_modal_4"
-                      className="flex justify-center modal"
-                    >
-                      <div className="modal-box w-full max-w-6xl">
-                        <UpdatePost key={post._id} post={post} />
-                        <div className="modal-action">
-                          <form method="dialog">
-                            <button className="btn">Close</button>
-                          </form>
-                        </div>
-                      </div>
-                    </dialog>
                   </li>
                   <li>
                     <button
                       onClick={() => deletePost(post._id)}
-                      className={`btn btn-sm  bg-red-500 hover:bg-red-700 text-white gap-2`}
+                      className="btn btn-sm bg-red-500 hover:bg-red-700 text-white gap-2"
                     >
                       <span className="inline">delete</span>
                     </button>
@@ -98,6 +85,19 @@ const UserPost = (setPost) => {
           )}
         </div>
       ))}
+        {/* Update Modal */}
+    <dialog id="my_modal_4" className="modal">
+      <div className="modal-box w-full max-w-6xl">
+        {activePost && <UpdatePost post={activePost} />} {/* ✅ Only render when needed */}
+        <div className="modal-action">
+          <form method="dialog">
+            <button className="btn" onClick={() => setActivePost(null)}>
+              Close
+            </button>
+          </form>
+        </div>
+      </div>
+    </dialog>
     </>
   );
 };

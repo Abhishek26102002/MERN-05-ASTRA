@@ -16,10 +16,6 @@ import { UserStore } from "../ApiStore/UserStore";
 
 const Navbar = () => {
   const { setuser, logout, checkAuth } = UserStore();
-  useEffect(() => {
-    checkAuth();
-    setuser;
-  }, [setuser]);
 
   return (
     <>

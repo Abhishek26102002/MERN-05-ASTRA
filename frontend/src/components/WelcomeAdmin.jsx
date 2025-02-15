@@ -15,11 +15,6 @@ const WelcomeAdmin = () => {
   const { allUsers, fetchUsers,checkAuth,setuser } = UserStore();
   const { setallpost, fetchAllPost } = PostStore();
 
-  useEffect(() => {
-    checkAuth();
-    fetchAllPost();
-    fetchUsers();
-  }, []);
   return (
     <div className="-m-5 ">
       <div className=" stats shadow">
