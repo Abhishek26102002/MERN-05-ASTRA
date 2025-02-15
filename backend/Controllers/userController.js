@@ -300,8 +300,21 @@ export const profilepicUpdate = async (req, res) => {
       });
     }
 
-    // Upload to Cloudinary (use req.file.path)
-    const uploadResponse = await cloudinary.uploader.upload(req.file.path);
+     // Upload file to Cloudinary
+     const uploadResponse = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { resource_type: "image" },
+        (error, result) => {
+          if (error) {
+            console.error("Cloudinary Upload Error:", error);
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+      stream.end(req.file.buffer);
+    });
 
     // Update user profile with new image URL
     const updatedUser = await Users.findByIdAndUpdate(

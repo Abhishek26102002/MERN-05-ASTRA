@@ -5,6 +5,8 @@ import { fileURLToPath } from "url";
 import Users from "../Models/users.js";
 import fs from "fs";
 import cloudinary from "../Config/cloudinary.js";
+// import upload from "../Middlewares/multer.js";
+// import cloudinary from "cloudinary";
 
 // Convert __dirname for ES module compatibility
 const __filename = fileURLToPath(import.meta.url);
@@ -30,10 +32,25 @@ export const createPost = asyncHandler(async (req, res) => {
       });
     }
 
-    // Upload to Cloudinary (use req.file.path)
-    const uploadResponse = await cloudinary.uploader.upload(req.file.path);
+    // Upload file to Cloudinary
+    const uploadResponse = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { resource_type: "image" },
+        (error, result) => {
+          if (error) {
+            console.error("Cloudinary Upload Error:", error);
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+      stream.end(req.file.buffer);
+    });
+
     const userId = req.user.id;
 
+    // Create new post with Cloudinary image URL
     const newPost = await Blog.create({
       image: uploadResponse.secure_url,
       title,
@@ -54,8 +71,8 @@ export const createPost = asyncHandler(async (req, res) => {
       data: newPost,
     });
   } catch (error) {
-    console.log("Error in createPost PostController :", error.message);
-    res.status(500).json({ success: false, message: "Internal Server error" });
+    console.error("Error in createPost PostController:", error.message);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
 
@@ -116,9 +133,10 @@ export const fetchAllpostOfUser = asyncHandler(async (req, res) => {
 });
 export const fetchAllpostByUserId = asyncHandler(async (req, res) => {
   try {
-   
     // Retrieve blogs created by a specific user
-    const blogs = await Blog.find({ createdBy: req.params.id }).sort({ createdAt: -1 });
+    const blogs = await Blog.find({ createdBy: req.params.id }).sort({
+      createdAt: -1,
+    });
 
     // Check if any blogs are found
     if (!blogs || blogs.length === 0) {
@@ -266,7 +284,21 @@ export const updatePost = asyncHandler(async (req, res) => {
     const { title, blogText, category } = req.body;
 
     // Handle image file if provided
-    const uploadResponse = await cloudinary.uploader.upload(req.file.path);
+    // Upload file to Cloudinary
+    const uploadResponse = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { resource_type: "image" },
+        (error, result) => {
+          if (error) {
+            console.error("Cloudinary Upload Error:", error);
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+      stream.end(req.file.buffer);
+    });
 
     // Update the blog fields
     blog.title = title || blog.title;
@@ -390,7 +422,7 @@ export const upcount = asyncHandler(async (req, res) => {
 export const fetchPostByPostId = asyncHandler(async (req, res) => {
   try {
     // Retrieve blogs created by a specific user
-    const blogs = await Blog.findOne({_id:req.params.id});
+    const blogs = await Blog.findOne({ _id: req.params.id });
 
     // Check if any blogs are found
     if (!blogs || blogs.length === 0) {
