@@ -57,7 +57,7 @@ const UserPost = (setPost) => {
 
                 <ul
                   tabIndex={0}
-                  className="top-10  menu dropdown-content bg-base-100 rounded-box z-[1] m-5  w-32 p-2 gap-4 shadow"
+                  className="-top-5 sm:top-10 menu dropdown-content bg-base-100 rounded-box z-[1] m-5  w-32 p-2 gap-4 shadow"
                 >
                   <li>
                     <button
