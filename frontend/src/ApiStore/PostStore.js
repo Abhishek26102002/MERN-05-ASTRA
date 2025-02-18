@@ -5,11 +5,11 @@ import { toast } from "react-hot-toast";
 export const PostStore = create((set, get) => ({
   setallpost: [],
   setPost: [],
-  setpostbyuid:[],
+  setpostbyuid: [],
   setpostuser: null,
   isLoadingPost: false,
   isuserLoading: false,
-  setonepost:null,
+  setonepost: null,
 
   fetchAllPost: async () => {
     set({ isLoadingPost: true });
@@ -18,7 +18,7 @@ export const PostStore = create((set, get) => ({
       set({ setallpost: res.data.data });
     } catch (error) {
       console.log("Error in fetchAllPost userPostStore", error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data.message);
     } finally {
       set({ isLoadingPost: false });
     }
@@ -35,26 +35,28 @@ export const PostStore = create((set, get) => ({
       set({ isLoadingPost: false });
     }
   },
-  fetchpostbyid:async(postId)=>{
+  fetchpostbyid: async (postId) => {
     set({ isLoadingPost: true });
     try {
       const res = await axiosInstance.get(`/post/fetchonepost/${postId}`);
       set({ setonepost: res.data.data });
     } catch (error) {
       console.log("Error in fetchAllPost userPostStore", error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data.message);
     } finally {
       set({ isLoadingPost: false });
     }
   },
-  fetchpostbyuserid:async(userId)=>{
+  fetchpostbyuserid: async (userId) => {
     set({ isLoadingPost: true });
     try {
-      const res = await axiosInstance.get(`/post/fetchallpostbyuserid/${userId}`);
+      const res = await axiosInstance.get(
+        `/post/fetchallpostbyuserid/${userId}`
+      );
       set({ setpostbyuid: res.data.data });
     } catch (error) {
       console.log("Error in fetchAllPost userPostStore", error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data.message);
     } finally {
       set({ isLoadingPost: false });
     }
@@ -119,9 +121,19 @@ export const PostStore = create((set, get) => ({
       set({ setpostuser: res.data.data[0] });
     } catch (error) {
       console.log("Error in fetchuserbyhisid userPostStore", error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data.message);
     } finally {
       set({ isuserLoading: false });
+    }
+  },
+
+  likeUnlike: async (postId) => {
+    try {
+      const res = await axiosInstance.put(`/post/upvote/${postId}`);
+      toast.success(res.data.message);
+    } catch (error) {
+      console.log("Error in fetchuserbyhisid userPostStore", error);
+      toast.error(error.response?.data.message);
     }
   },
 }));

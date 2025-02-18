@@ -2,15 +2,17 @@ import React, { useEffect, useState } from "react";
 import { Settings, SquarePlus } from "lucide-react";
 import { UserStore } from "../ApiStore/UserStore";
 import { PostStore } from "../ApiStore/PostStore";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CreatePost from "../components/CreatePost";
 import UserPost from "../components/UserPost";
 import UserSkeleton from "../components/skeleton/UserSkeleton";
 import PostSkeleton from "../components/skeleton/PostSkeleton";
 import { useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import Dashboard from "./Dashboard";
 const SingleProfile = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { isLoading, setuser } = UserStore();
   const [activeTab, setActiveTab] = useState("posts");
   const {
@@ -22,11 +24,14 @@ const SingleProfile = () => {
   } = PostStore();
 
   useEffect(() => {
+    if (id === setuser?._id) {
+      navigate("/dashboard"); // Redirect user to the dashboard
+    }
     if (id) {
       fetchuserbyhisid(id);
       fetchpostbyuserid(id);
     }
-  }, [id]);
+  }, [id, setuser, navigate]);
 
   if (isLoadingPost) return <PostSkeleton />;
 

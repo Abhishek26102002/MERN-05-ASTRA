@@ -7,6 +7,8 @@ import CreatePost from "../components/CreatePost";
 import UserPost from "../components/UserPost";
 import UserSkeleton from "../components/skeleton/UserSkeleton";
 import PostSkeleton from "../components/skeleton/PostSkeleton";
+import UserSavedPost from "../components/UserSavedPost";
+import UserLikedPost from "../components/UserLikedPost";
 
 const Dashboard = () => {
   const { isLoading, setuser } = UserStore();
@@ -122,11 +124,11 @@ const Dashboard = () => {
               </button>
               <button
                 className={`pb-2  pt-4 ${
-                  activeTab === "tagged"
+                  activeTab === "liked"
                     ? "border-b-2 border-black"
                     : "opacity-50"
                 }`}
-                onClick={() => setActiveTab("tagged")}
+                onClick={() => setActiveTab("liked")}
               >
                 Liked
               </button>
@@ -136,6 +138,8 @@ const Dashboard = () => {
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-6 p-4 w-full sm:w-[80%]">
               {isLoadingPost ? <PostSkeleton /> : ""}
               {activeTab === "posts" && <UserPost setpost={setPost} />}
+              {activeTab === "saved" && <UserSavedPost />}
+              {activeTab === "liked" && <UserLikedPost />}
             </div>
           </div>
           {setPost?.length === 0 ? (

@@ -19,19 +19,19 @@ const AdminPanel = () => {
             <div className="flex flex-row">
               {/* Left Side /Sidebar */}
               <aside className="w-0 sm:w-96">
-                <div className="drawer lg:drawer-open">
+                <div className="drawer lg:drawer-open relative">
                   <input
                     id="my-drawer-2"
                     type="checkbox"
                     className="drawer-toggle"
                   />
-                  <div className="drawer-content flex flex-col items-start justify-start">
+                  <div className="drawer-content absolute -top-6 left-72">
                     {/* Page content here */}
                     <label
                       htmlFor="my-drawer-2"
                       className="drawer-button lg:hidden"
                     >
-                     <TableOfContents />
+                      <TableOfContents />
                     </label>
                   </div>
                   <div className="drawer-side mt-20 sm:mt-0 z-10">
@@ -78,6 +78,15 @@ const AdminPanel = () => {
                         >
                           Stats
                         </button>
+                      </li>
+                      <li>
+                        <button className={"pb-2 pt-4"}>Settings</button>
+                      </li>
+                      <li>
+                        <button className={"pb-2 pt-4"}>About section</button>
+                      </li>
+                      <li>
+                        <button className={"pb-2 pt-4"}>more features</button>
                       </li>
                     </ul>
                   </div>

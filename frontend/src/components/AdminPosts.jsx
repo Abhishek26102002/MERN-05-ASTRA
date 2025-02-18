@@ -74,7 +74,7 @@ const AdminPosts = () => {
                     <span>postId: {post?._id}</span>
                     <br />
                     <span className="text-gray-500">
-                      UserId : {post?.createdBy}
+                      UserId : {post?.createdBy[0]._id}
                     </span>
                   </div>
                 </td>

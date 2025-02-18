@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   CalendarDays,
   MessageCircle,
@@ -8,29 +8,40 @@ import {
 } from "lucide-react";
 import { PostStore } from "../ApiStore/PostStore";
 import { useParams, Link } from "react-router-dom";
+import { UserStore } from "../ApiStore/UserStore";
 
 const SingleBlog = () => {
+  const [liked, setLiked] = useState();
   const { id } = useParams(); // this is post id
   const {
-    fetchuserbyhisid,
     isuserLoading,
-    setpostuser,
     fetchpostbyid,
     isLoadingPost,
     setonepost,
+    likeUnlike,
   } = PostStore();
+
+  // console.log(setonepost?.createdBy[0]);
+
+  const { setuser } = UserStore();
 
   useEffect(() => {
     fetchpostbyid(id);
   }, [id]); // Runs whenever `id` changes
 
+  //TODO: optimise instant like , already liked or not {working fine if not hard reload}
   useEffect(() => {
-    if (setonepost?.createdBy) {
-      fetchuserbyhisid(setonepost.createdBy);
-    }
-  }, [setonepost?.createdBy]); // Runs whenever `createdBy` changes
+    setonepost?.upvoters[0]?._id.includes(setuser?._id)
+      ? setLiked(true)
+      : setLiked(false);
+  }, [setonepost?.createdBy[0]._id]); // Runs whenever `createdBy` changes
 
   if (isuserLoading || isLoadingPost) return <div>Loading...</div>;
+
+  const handleLike = async (postId) => {
+    liked ? setLiked(false) : setLiked(true);
+    await likeUnlike(postId);
+  };
 
   return (
     <>
@@ -39,19 +50,25 @@ const SingleBlog = () => {
           <div className="bg-base-300 rounded-xl p-6 space-y-8">
             {/* User Info */}
             <Link
-              to={`/singleProfile/${setonepost?.createdBy}`}
+              to={`/singleProfile/${setonepost?.createdBy[0]._id}`}
               className="gap-4"
             >
               <div className="flex items-center gap-4 mb-4">
                 <div className="avatar">
                   <div className="w-14 sm:w-20 rounded-full">
-                    <img src={setpostuser?.profilepic || "/profile.png"} />
+                    <img
+                      src={
+                        setonepost?.createdBy[0]?.profilepic || "/profile.png"
+                      }
+                    />
                   </div>
                 </div>
                 <div>
                   <div className="flex gap-6">
-                  <p className="font-semibold ">{setpostuser?.name}</p>
-                  <SquareArrowOutUpRight size={20} />
+                    <p className="font-semibold ">
+                      {setonepost?.createdBy[0]?.name}
+                    </p>
+                    <SquareArrowOutUpRight size={20} />
                   </div>
                   <p className="text-sm flex items-center gap-1">
                     <CalendarDays size={16} /> Published:{" "}
@@ -76,8 +93,21 @@ const SingleBlog = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-6">
-              <button className="flex items-center gap-1 hover:text-red-500">
-                <Heart size={20} /> Like
+              <button
+                className="flex items-center gap-1"
+                onClick={() => handleLike(setonepost._id)}
+              >
+                {liked ? (
+                  <>
+                    <Heart size={20} className="text-red-500 fill-red-500" />
+                    <p>{setonepost?.upvoters.length + 1}</p>
+                  </>
+                ) : (
+                  <>
+                    <Heart size={20} />
+                    <p>{setonepost?.upvoters.length}</p>
+                  </>
+                )}
               </button>
               <button className="flex items-center gap-1 hover:text-red-500">
                 <MessageCircle size={20} /> Comments {setonepost?.comments}

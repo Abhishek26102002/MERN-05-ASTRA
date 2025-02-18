@@ -15,7 +15,7 @@ import {
 import { UserStore } from "../ApiStore/UserStore";
 
 const Navbar = () => {
-  const { setuser, logout, checkAuth } = UserStore();
+  const { setuser, logout } = UserStore();
 
   return (
     <>
@@ -24,15 +24,6 @@ const Navbar = () => {
         <div className="drawer-content flex flex-col">
           {/* Left Side */}
           <div className="navbar bg-base-300 w-full flex flex-row justify-between">
-            <div className="flex-none lg:hidden">
-              <label
-                htmlFor="my-drawer-3"
-                aria-label="open sidebar"
-                className="btn btn-square btn-ghost"
-              >
-                <ChartNoAxesGantt />
-              </label>
-            </div>
             <div className="flex items-center">
               <Link
                 to="/"
@@ -41,6 +32,15 @@ const Navbar = () => {
                 <img src="/logo04.png" className="w-10 h-10 flex" alt="Astra" />
                 <h1 className="text-lg font-bold text-white">Astra</h1>
               </Link>
+            </div>
+            <div className="flex-none lg:hidden">
+              <label
+                htmlFor="my-drawer-3"
+                aria-label="open sidebar"
+                className="btn btn-square btn-ghost"
+              >
+                <ChartNoAxesGantt />
+              </label>
             </div>
 
             <div className="hidden lg:flex items-center gap-4">

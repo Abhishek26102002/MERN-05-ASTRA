@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, Heart } from "lucide-react";
 import UpdatePost from "./UpdatePost";
 import { PostStore } from "../ApiStore/PostStore";
 import { UserStore } from "../ApiStore/UserStore";
@@ -44,6 +44,10 @@ const UserPost = (setPost) => {
                   ? post.blogText.slice(0, 87) + "..."
                   : post.blogText}
               </p>
+              <div className="mt-2 flex flex-row">
+                <Heart className="text-red-600" />
+                <p className="text-white ms-2">{post?.upvoters.length} Likes</p>
+              </div>
             </div>
           </Link>
 
@@ -85,19 +89,20 @@ const UserPost = (setPost) => {
           )}
         </div>
       ))}
-        {/* Update Modal */}
-    <dialog id="my_modal_4" className="modal">
-      <div className="modal-box w-full max-w-6xl">
-        {activePost && <UpdatePost post={activePost} />} {/* ✅ Only render when needed */}
-        <div className="modal-action">
-          <form method="dialog">
-            <button className="btn" onClick={() => setActivePost(null)}>
-              Close
-            </button>
-          </form>
+      {/* Update Modal */}
+      <dialog id="my_modal_4" className="modal">
+        <div className="modal-box w-full max-w-6xl">
+          {activePost && <UpdatePost post={activePost} />}{" "}
+          {/* ✅ Only render when needed */}
+          <div className="modal-action">
+            <form method="dialog">
+              <button className="btn" onClick={() => setActivePost(null)}>
+                Close
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
-    </dialog>
+      </dialog>
     </>
   );
 };
