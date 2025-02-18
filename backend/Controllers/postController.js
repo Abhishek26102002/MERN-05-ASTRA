@@ -48,19 +48,26 @@ export const createPost = asyncHandler(async (req, res) => {
       stream.end(req.file.buffer);
     });
 
-    const userId = req.user.id;
+    const { name, profilepic, email, id } = req.user;
+
+    const userdetails = {
+      _id: id,
+      name,
+      profilepic,
+      email,
+    };
 
     // Create new post with Cloudinary image URL
     const newPost = await Blog.create({
       image: uploadResponse.secure_url,
       title,
       blogText,
-      createdBy: userId,
+      createdBy: userdetails,
       category,
     });
 
     await Users.findByIdAndUpdate(
-      userId,
+      id,
       { $push: { blogs: newPost._id } },
       { new: true }
     );
@@ -111,7 +118,7 @@ export const fetchAllpostOfUser = asyncHandler(async (req, res) => {
   try {
     const id = req.user.id;
     // Retrieve blogs created by a specific user
-    const blogs = await Blog.find({ createdBy: id }).sort({ createdAt: -1 });
+    const blogs = await Blog.find({ "createdBy._id": id }).sort({ createdAt: -1 });
 
     // Check if any blogs are found
     if (!blogs || blogs.length === 0) {
@@ -133,8 +140,7 @@ export const fetchAllpostOfUser = asyncHandler(async (req, res) => {
 });
 export const fetchAllpostByUserId = asyncHandler(async (req, res) => {
   try {
-    // Retrieve blogs created by a specific user
-    const blogs = await Blog.find({ createdBy: req.params.id }).sort({
+    const blogs = await Blog.find({ "createdBy._id": req.params.id }).sort({
       createdAt: -1,
     });
 
@@ -272,8 +278,9 @@ export const updatePost = asyncHandler(async (req, res) => {
       });
     }
 
-    // Check if the authenticated user is the creator of the blog
-    if (blog.createdBy.toString() !== userId) {
+    const blogCreatorId = blog.createdBy[0]._id.toString(); // Get the first user ID
+
+    if (blogCreatorId !== userId) {
       return res.status(403).json({
         success: false,
         message: "Forbidden: You are not authorized to update this blog",
@@ -388,33 +395,54 @@ export const upcount = asyncHandler(async (req, res) => {
       });
     }
 
+    // Find the user details
+    const user = await Users.findById(userId).select(
+      "_id name profilepic email"
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Ensure upvoters is initialized as an array
+    blog.upvoters = blog.upvoters || [];
+
     // Check if user has already upvoted
-    const userIndex = blog.upvoters ? blog.upvoters.indexOf(userId) : -1;
+    const userIndex = blog.upvoters.findIndex(
+      (upvoter) => upvoter._id.toString() === userId
+    );
 
     if (userIndex === -1) {
-      // User hasn't upvoted, increment the count and add user to upvoters
-      blog.blogUpPoint += 1;
-      blog.upvoters = blog.upvoters || [];
-      blog.upvoters.push(userId);
+      // User hasn't upvoted, increment count and add user details to upvoters
+      blog.blogUpPoint = (blog.blogUpPoint || 0) + 1;
+      blog.upvoters.push({
+        _id: user._id,
+        name: user.name,
+        profilepic: user.profilepic,
+        email: user.email,
+      });
     } else {
-      // User has already upvoted, decrement the count and remove user from upvoters
-      blog.blogUpPoint -= 1;
+      // User has already upvoted, decrement count and remove user from upvoters
+      blog.blogUpPoint = Math.max((blog.blogUpPoint || 0) - 1, 0);
       blog.upvoters.splice(userIndex, 1);
     }
 
     // Save the updated blog
-    const updatedBlog = await blog.save();
+    await blog.save();
 
     res.status(200).json({
       success: true,
-      message: userIndex === -1 ? "Upvoted successfully" : "Upvote removed",
+      message: userIndex === -1 ? "Liked" : "UnLiked",
       data: {
-        blogUpPoint: updatedBlog.upvoters.length,
-        upvoters: updatedBlog.upvoters,
+        blogUpPoint: blog.upvoters.length,
+        upvoters: blog.upvoters,
       },
     });
   } catch (error) {
-    console.log("Error in upCount PostController :", error.message);
+    console.error("Error in upcount PostController:", error.message);
     res.status(500).json({ success: false, message: "Internal Server error" });
   }
 });
