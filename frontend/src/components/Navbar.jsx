@@ -16,6 +16,7 @@ import { UserStore } from "../ApiStore/UserStore";
 
 const Navbar = () => {
   const { setuser, logout } = UserStore();
+  const [activeTab, setActiveTab] = useState("home");
 
   return (
     <>
@@ -30,7 +31,7 @@ const Navbar = () => {
                 className="flex items-center hover:opacity-80 transition-all"
               >
                 <img src="/logo04.png" className="w-10 h-10 flex" alt="Astra" />
-                <h1 className="text-lg font-bold text-white">Astra</h1>
+                <h1 className="text-lg font-bold text-white ms-4">Astra</h1>
               </Link>
             </div>
             <div className="flex-none lg:hidden">
@@ -42,32 +43,46 @@ const Navbar = () => {
                 <ChartNoAxesGantt />
               </label>
             </div>
-
-            <div className="hidden lg:flex items-center gap-4">
-              <Link
-                to="/"
-                className="flex gap-2 items-center  btn btn-outline btn-sm hover:text-gray-300"
+            {/* Main menu */}
+            <div
+              role="tablist"
+              className="hidden sm:block tabs tabs-lifted border"
+            >
+              <button
+                role="tab"
+                className={`tab ${activeTab === "home" ? "tab-active" : ""}`}
+                onClick={() => setActiveTab("home")}
               >
-                Home
-              </Link>
-              <Link
-                to="/about"
-                className="flex gap-2 items-center  btn btn-outline btn-sm hover:text-gray-300"
+                <Link to="/" className="flex justify-center items-center gap-2">
+                  <House size={15} />
+                  Home
+                </Link>
+              </button>
+              <button
+                role="tab"
+                className={`tab ${activeTab === "about" ? "tab-active" : ""}`}
+                onClick={() => setActiveTab("about")}
               >
-                About
-              </Link>
-              <Link
-                to="/contact"
-                className="flex gap-2 items-center  btn btn-outline btn-sm hover:text-gray-300"
+                <Link
+                  to="/about"
+                  className="flex justify-center items-center gap-2"
+                >
+                  <NotebookTabs size={15} /> about
+                </Link>
+              </button>
+              <button
+                role="tab"
+                className={`tab ${activeTab === "contact" ? "tab-active" : ""}`}
+                onClick={() => setActiveTab("contact")}
               >
-                Contact
-              </Link>
-              <Link
-                to="/test"
-                className="flex gap-2 items-center  btn btn-outline btn-sm hover:text-gray-300"
-              >
-                Test
-              </Link>
+                <Link
+                  to="/contact"
+                  className="flex justify-center items-center gap-2"
+                >
+                  <Headset size={15} />
+                  contact
+                </Link>
+              </button>
             </div>
 
             <div className="hidden flex-none lg:block">

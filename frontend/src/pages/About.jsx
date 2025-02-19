@@ -40,7 +40,7 @@ const About = () => {
               <h1 className="text-6xl font-bold mb-10">Who am I</h1>
             </div>
             {/* 1st */}
-            <Abhishek />
+            {/* <Abhishek /> */}
             {/* 1st End  */}
 
             {/* 2nd */}

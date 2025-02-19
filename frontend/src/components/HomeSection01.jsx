@@ -1,29 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 import { PostStore } from "../ApiStore/PostStore";
-import { useParams, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { UserStore } from "../ApiStore/UserStore";
 import { formatDistanceToNowStrict } from "date-fns";
+import SingleUserSkeleton from "../components/skeleton/SingleUserSkeleton";
+import PostSkeleton from "./skeleton/PostSkeleton";
+import HomeSection01Skeleton from "./skeleton/HomeSection01Skeleton";
 
 const HomeSection01 = (posts) => {
-  // console.log("posts.posts", posts.posts);
-  const [liked, setLiked] = useState(false);
   const [likedPosts, setLikedPosts] = useState({}); // Track liked status per post
-  const [usernow, setusernow] = useState("");
-  const {
-    fetchuserbyhisid,
-    isuserLoading,
-    setpostuser,
-    fetchpostbyid,
-    isLoadingPost,
-    setonepost,
-    likeUnlike,
-    fetchuserbyhisidSingle,
-  } = PostStore();
+  const { isuserLoading, isLoadingPost, likeUnlike } = PostStore();
 
   const { setuser } = UserStore();
 
-  if (isuserLoading || isLoadingPost) return <div>Loading...</div>;
+  if (isuserLoading || isLoadingPost) return <HomeSection01Skeleton />;
 
   const formatTimeAgo = (timestamp) => {
     if (!timestamp) return "Unknown time"; // Handle missing or invalid timestamp
@@ -67,7 +58,7 @@ const HomeSection01 = (posts) => {
             <h3 className="text-3xl font-semibold">{posts.posts[0]?.title}</h3>
             <div className="flex items-center mt-2 ">
               <Link to={`/singleProfile/${posts.posts[0]?.createdBy[0]?._id}`}>
-                <div className="flex pe-1 items-center border border-gray-500 rounded-full">
+                <div className="flex pe-1 items-center border border-gray-300 rounded-full">
                   <div className="avatar">
                     <div className="w-7 rounded-full">
                       <img
@@ -110,7 +101,7 @@ const HomeSection01 = (posts) => {
         </div>
 
         {/* Secondary Posts */}
-        <div className="gap-4 flex flex-col sm:flex-row mt-4 ">
+        <div className="gap-4 flex flex-col sm:flex-row mt-4 sm:ms-2">
           {posts.posts.slice(1, 3).map((post, index) => (
             <div key={post._id} className="flex gap-4 p-1">
               <Link to={`/singleblog/${post._id}`}>
@@ -129,7 +120,7 @@ const HomeSection01 = (posts) => {
                 <h3 className="text-xl font-semibold">{post.title}</h3>
                 <div className="flex  items-center mt-2 ">
                   <Link to={`/singleProfile/${post?.createdBy[0]?._id}`}>
-                    <div className="flex pe-1 items-center sm:border sm:border-gray-500 rounded-full">
+                    <div className="flex pe-1 items-center sm:border sm:border-gray-300 rounded-full">
                       <div className="avatar">
                         <div className="w-7 rounded-full">
                           <img
@@ -194,42 +185,49 @@ const HomeSection01 = (posts) => {
             </Link>
             <div className="flex flex-col justify-between">
               <h3 className="text-xl font-semibold">{post.title}</h3>
-              <div className="flex items-center mt-2">
-                <Link to={`/singleProfile/${post?.createdBy[0]?._id}`}>
-                  <div className="flex pe-1  items-center border border-gray-500 rounded-full">
-                    <div className="avatar">
-                      <div className="w-7 rounded-full">
-                        <img
-                          src={post.createdBy[0]?.profilepic || "./profile.png"}
-                        />
+              <div className="flex items-center mt-2 justify-between">
+                <div className="flex flex-row w-52">
+                  <Link to={`/singleProfile/${post?.createdBy[0]?._id}`}>
+                    <div className="flex pe-1  items-center border border-gray-300 rounded-full">
+                      <div className="avatar">
+                        <div className="w-7 rounded-full">
+                          <img
+                            src={
+                              post.createdBy[0]?.profilepic || "./profile.png"
+                            }
+                          />
+                        </div>
                       </div>
+                      <span className="ms-2 text-xs">
+                        {" "}
+                        {post.createdBy[0]?.name}
+                      </span>
                     </div>
-                    <span className="ms-2 text-xs">
-                      {" "}
-                      {post.createdBy[0]?.name}
-                    </span>
-                  </div>
-                </Link>
-                <button
-                  className="ms-4 flex items-center gap-2"
-                  onClick={() => {
-                    handleLike(post?._id);
-                  }}
-                >
-                  {likedPosts[post._id] ||
-                  post?.upvoters[0]?._id.includes(setuser?._id) ? (
-                    <>
-                      <Heart size={20} className="text-red-500 fill-red-500" />
-                      <p>{post?.upvoters?.length + 1 || 0}</p>
-                    </>
-                  ) : (
-                    <>
-                      <Heart size={20} />
-                      <p>{post?.upvoters?.length || 0}</p>
-                    </>
-                  )}
-                </button>
-                <span className="hidden sm:flex text-gray-400 text-xs ml-auto">
+                  </Link>
+                  <button
+                    className="ms-4 flex items-center gap-2"
+                    onClick={() => {
+                      handleLike(post?._id);
+                    }}
+                  >
+                    {likedPosts[post._id] ||
+                    post?.upvoters[0]?._id.includes(setuser?._id) ? (
+                      <>
+                        <Heart
+                          size={20}
+                          className="text-red-500 fill-red-500"
+                        />
+                        <p>{post?.upvoters?.length + 1 || 0}</p>
+                      </>
+                    ) : (
+                      <>
+                        <Heart size={20} />
+                        <p>{post?.upvoters?.length || 0}</p>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <span className="hidden sm:flex text-gray-400 text-xs">
                   {formatTimeAgo(post.createdAt)}
                 </span>
               </div>
@@ -237,7 +235,6 @@ const HomeSection01 = (posts) => {
           </div>
         ))}
       </div>
-      {/* Trending Posts */}
     </div>
   );
 };
