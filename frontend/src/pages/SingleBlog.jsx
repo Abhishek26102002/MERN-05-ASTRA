@@ -9,6 +9,8 @@ import {
 import { PostStore } from "../ApiStore/PostStore";
 import { useParams, Link } from "react-router-dom";
 import { UserStore } from "../ApiStore/UserStore";
+import PostSkeleton from "../components/skeleton/PostSkeleton";
+import SinglePostSkeleton from "../components/skeleton/SinglePostSkeleton";
 
 const SingleBlog = () => {
   const [liked, setLiked] = useState();
@@ -36,12 +38,12 @@ const SingleBlog = () => {
       : setLiked(false);
   }, [setonepost?.createdBy[0]._id]); // Runs whenever `createdBy` changes
 
-  if (isuserLoading || isLoadingPost) return <div>Loading...</div>;
-
   const handleLike = async (postId) => {
     liked ? setLiked(false) : setLiked(true);
     await likeUnlike(postId);
   };
+
+  if (isuserLoading || isLoadingPost) return <SinglePostSkeleton />;
 
   return (
     <>

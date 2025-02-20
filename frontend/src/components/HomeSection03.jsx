@@ -94,6 +94,7 @@ const HomeSection03 = (posts) => {
                 </div>
               </div>
               <>
+              
                 <div className="collapse pt-2 -ms-4 w-80 sm:w-full ">
                   <input type="checkbox" />
                   <div className="collapse-title flex flex-row gap-1 ">

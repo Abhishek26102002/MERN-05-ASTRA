@@ -13,8 +13,10 @@ import {
   ChartNoAxesGantt,
 } from "lucide-react";
 import { UserStore } from "../ApiStore/UserStore";
+import { useSearch } from "../lib/SearchContext.jsx";
 
 const Navbar = () => {
+  const { searchQuery, setSearchQuery } = useSearch();
   const { setuser, logout } = UserStore();
   const [activeTab, setActiveTab] = useState("home");
 
@@ -87,7 +89,18 @@ const Navbar = () => {
 
             <div className="hidden flex-none lg:block">
               {/* Right-side Navigation */}
+
               <div className="flex items-center gap-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search"
+                    className="input input-bordered h-9 px-3"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <Search className="absolute right-2 top-2 w-5 h-5 text-gray-500" />
+                </div>
                 {setuser ? (
                   // Logged-in state
                   <>
@@ -153,14 +166,6 @@ const Navbar = () => {
                 ) : (
                   // Logged-out state
                   <>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Search"
-                        className="input input-bordered h-9 px-3"
-                      />
-                      <Search className="absolute right-2 top-2 w-5 h-5 text-gray-500" />
-                    </div>
                     <Link to={"/setting"} className={"btn btn-sm btn-outline"}>
                       <Settings2 className="w-4 h-4" />
                       <span className="hidden sm:inline">Settings</span>
@@ -260,6 +265,8 @@ const Navbar = () => {
                   type="text"
                   placeholder="Search"
                   className="input input-bordered h-9 px-3 w-full"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <Search className="absolute right-6 top-4 w-5 h-5 text-gray-500" />
               </div>

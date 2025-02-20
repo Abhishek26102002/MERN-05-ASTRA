@@ -133,7 +133,13 @@ export const PostStore = create((set, get) => ({
       toast.success(res.data.message);
     } catch (error) {
       console.log("Error in fetchuserbyhisid userPostStore", error);
-      toast.error(error.response?.data.message);
+      if (!error.response?.data.success) {
+        toast.error("You must be logged in to Like a post");
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 1000);
+      }
+      // toast.error(error.response?.data.message);
     }
   },
 }));

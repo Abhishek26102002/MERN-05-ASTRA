@@ -7,10 +7,10 @@ const SingleUserSkeleton = () => {
       {count?.map((_, idx) => (
         <div key={idx} className="flex w-full flex-col gap-4 rounded-lg">
           <div className="flex items-center gap-4">
-            <div className="skeleton h-16 w-16 shrink-0 rounded-full bg-gray-100 "></div>
+            <div className="skeleton h-16 w-16 shrink-0 rounded-full bg-slate-500"></div>
             <div className="flex flex-col gap-4">
-              <div className="skeleton h-4 w-96 bg-gray-100 "></div>
-              <div className="skeleton h-4 w-28 bg-gray-100 "></div>
+              <div className="skeleton h-4 w-96 bg-slate-500"></div>
+              <div className="skeleton h-4 w-28 bg-slate-500"></div>
             </div>
           </div>
         </div>
