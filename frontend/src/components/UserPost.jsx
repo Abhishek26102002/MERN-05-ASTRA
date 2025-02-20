@@ -52,7 +52,7 @@ const UserPost = (setPost) => {
           </Link>
 
           {/* 3-Dots Icon */}
-          {setuser?._id === post.createdBy || setuser?.is_Admin ? (
+          {setuser?._id === post.createdBy[0]?._id || setuser?.is_Admin ? (
             <div key={post?._id} className="absolute top-2 right-2 text-black ">
               <div className="dropdown dropdown-end glass rounded-lg">
                 <EllipsisVertical
