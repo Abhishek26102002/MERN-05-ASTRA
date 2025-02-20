@@ -351,7 +351,7 @@ export const deletePost = asyncHandler(async (req, res) => {
     }
 
     // Check if the authenticated user is the creator or an admin
-    if (blog.createdBy.toString() !== userId && !isAdmin) {
+    if (blog.createdBy[0]._id.toString() !== userId && !isAdmin) {
       return res.status(403).json({
         success: false,
         message: "Forbidden: You are not authorized to delete this blog",
