@@ -46,6 +46,7 @@ const App = () => {
         <Route path="/singleblog/:id" element={<SingleBlog />} />
         <Route path="/singleProfile/:id" element={<SingleProfile />} />
         <Route path="/about" element={<About />} />
+        <Route path="/test" element={<Test />} />
 
         {/* Default 404 page */}
         <Route path="*" element={<Test />} />

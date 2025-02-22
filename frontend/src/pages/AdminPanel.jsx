@@ -12,9 +12,9 @@ import {
 import AdminPosts from "../components/AdminPosts";
 import AdminUsers from "../components/AdminUsers";
 import AdminStats from "../components/AdminStats";
-import NavbarAside from "../components/NavbarAside";
 import { Link } from "react-router-dom";
 import Setting from "../pages/Setting";
+import AdminPerformance from "../components/AdminPerformance";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("users");
@@ -167,6 +167,7 @@ const AdminPanel = () => {
                   {activeTab === "users" && <AdminUsers />}
                   {activeTab === "stats" && <AdminStats />}
                   {activeTab === "theme" && <Setting />}
+                  {activeTab === "performance" && <AdminPerformance />}
                 </>
               </div>
             </div>

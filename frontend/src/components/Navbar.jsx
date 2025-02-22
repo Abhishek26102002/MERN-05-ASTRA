@@ -11,6 +11,7 @@ import {
   Images,
   Crown,
   ChartNoAxesGantt,
+  FlaskConical
 } from "lucide-react";
 import { UserStore } from "../ApiStore/UserStore";
 import { useSearch } from "../lib/SearchContext.jsx";
@@ -83,6 +84,19 @@ const Navbar = () => {
                 >
                   <Headset size={15} />
                   contact
+                </Link>
+              </button>
+              <button
+                role="tab"
+                className={`tab ${activeTab === "test" ? "tab-active" : ""}`}
+                onClick={() => setActiveTab("test")}
+              >
+                <Link
+                  to="/test"
+                  className="flex justify-center items-center gap-2"
+                >
+                  <FlaskConical size={15} />
+                  Test
                 </Link>
               </button>
             </div>
@@ -283,7 +297,7 @@ const Navbar = () => {
             </li>
             <li>
               <Link
-                to="/blog"
+                to="/test"
                 className="flex gap-2 items-center  btn btn-outline btn-sm hover:text-gray-300"
               >
                 <Images className="size-5" />

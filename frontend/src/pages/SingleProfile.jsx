@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Settings, SquarePlus } from "lucide-react";
 import { UserStore } from "../ApiStore/UserStore";
 import { PostStore } from "../ApiStore/PostStore";
 import { Link, useNavigate } from "react-router-dom";
-import CreatePost from "../components/CreatePost";
 import UserPost from "../components/UserPost";
 import UserSkeleton from "../components/skeleton/UserSkeleton";
 import PostSkeleton from "../components/skeleton/PostSkeleton";
 import { useParams } from "react-router-dom";
-import { toast } from "react-hot-toast";
-import Dashboard from "./Dashboard";
+import UserSavedPost from "../components/UserSavedPost";
+import UserLikedPost from "../components/UserLikedPost";
+
 const SingleProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -32,8 +31,6 @@ const SingleProfile = () => {
       fetchpostbyuserid(id);
     }
   }, [id, setuser, navigate]);
-
-  if (isLoadingPost) return <PostSkeleton />;
 
   if (isLoading) return <UserSkeleton />;
 
@@ -94,7 +91,7 @@ const SingleProfile = () => {
               </div>
 
               {/* Name */}
-              <p className="text-md font-semibold">ÄbhïshêK</p>
+              <p className="text-md font-semibold">About you</p>
             </div>
           </div>
           <hr />
@@ -112,31 +109,14 @@ const SingleProfile = () => {
               >
                 Posts
               </button>
-              <button
-                className={`pb-2  pt-4 ${
-                  activeTab === "saved"
-                    ? "border-b-2 border-black"
-                    : "opacity-50"
-                }`}
-                onClick={() => setActiveTab("saved")}
-              >
-                Saved
-              </button>
-              <button
-                className={`pb-2  pt-4 ${
-                  activeTab === "tagged"
-                    ? "border-b-2 border-black"
-                    : "opacity-50"
-                }`}
-                onClick={() => setActiveTab("tagged")}
-              >
-                Liked
-              </button>
+             
             </div>
 
             {/* Post Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-6 p-4 w-full sm:w-[80%]">
+              {isLoadingPost ? <PostSkeleton /> : ""}
               {activeTab === "posts" && <UserPost setpost={setpostbyuid} />}
+          
             </div>
           </div>
           {setpostbyuid?.length === 0 ? (

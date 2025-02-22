@@ -8,7 +8,8 @@ import Pagination from "./Pagination";
 
 const AdminUsers = () => {
   const navigate = useNavigate();
-  const { fetchUsers, isLoading, allUsers, deleteUser, setuser } = UserStore();
+  const { fetchUsers, isLoading, allUsers, deleteUser, setuser, adminToggle } =
+    UserStore();
   const [deleteMail, setDeleteMail] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1); // for pagination
@@ -17,6 +18,8 @@ const AdminUsers = () => {
   const lastUserIndex = currentPage * userPerPage;
   const firstUserIndex = lastUserIndex - userPerPage;
   const currentUser = allUsers?.slice(firstUserIndex, lastUserIndex);
+
+  const [isAdmin, setIsAdmin] = useState({}); // Track liked status per post
 
   useEffect(() => {
     fetchUsers();
@@ -33,6 +36,25 @@ const AdminUsers = () => {
     } catch (error) {
       console.error("Error deleting account:", error);
       toast.error("Failed to delete account.");
+    }
+  };
+
+  const handleAdminToggle = async (userId) => {
+    try {
+
+      if (setuser._id === userId) {
+        toast.error("You cannot toggle your self !!");
+        return;
+      }
+
+      await adminToggle(userId);
+
+      setIsAdmin((prevAdmin) => ({
+        ...prevAdmin,
+        [userId]: !prevAdmin[userId], // Toggle like status for the specific post
+      }));
+    } catch (error) {
+      console.log("Error in handle Like Homesection01 ", error);
     }
   };
 
@@ -75,10 +97,18 @@ const AdminUsers = () => {
                       <div className="font-bold">{user.name}</div>
                       <div
                         className={`text-sm ${
-                          user.is_Admin ? "text-red-500" : "text-teal-500"
+                          isAdmin[user._id] || user.is_Admin ? "text-red-500" : "text-teal-500"
                         }`}
                       >
-                        {user.is_Admin ? "Admin" : "User"}
+                        <div className="flex items-center space-x-2">
+                          <span>{isAdmin[user._id] || user.is_Admin ? "Admin" : "User"}</span>
+                          <input
+                            type="checkbox"
+                            className="toggle toggle-info toggle-sm"
+                            checked={isAdmin[user?._id] || user.is_Admin}
+                            onChange={() => handleAdminToggle(user._id)} // Call API when toggled
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>

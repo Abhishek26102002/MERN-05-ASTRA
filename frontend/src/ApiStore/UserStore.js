@@ -139,4 +139,15 @@ export const UserStore = create((set) => ({
       toast.error(error.response.data.message);
     }
   },
+  adminToggle: async (userId) => {
+
+    try {
+      const res = await axiosInstance.put(`/toggleadmin/${userId}`);
+      toast.success(res.data.message);
+    } catch (error) {
+      console.log("Error in adminToggle userStore", error);
+      toast.error(error.response?.data?.message || "Failed !");
+    } 
+  },
+
 }));

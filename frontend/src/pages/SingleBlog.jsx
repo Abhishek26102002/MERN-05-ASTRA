@@ -87,7 +87,7 @@ const SingleBlog = () => {
             <img
               src={setonepost?.image}
               alt={setonepost?.title}
-              className="w-full h-72 sm:h-96 object-cover rounded-lg mb-4"
+              className="w-full sm:w-[60%] h-72 sm:h-full object-cover rounded-lg mb-4 sm:mx-auto"
             />
 
             {/* Description */}

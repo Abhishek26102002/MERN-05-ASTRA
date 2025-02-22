@@ -94,7 +94,7 @@ const Dashboard = () => {
               </div>
 
               {/* Name */}
-              <p className="text-md font-semibold">ÄbhïshêK</p>
+              <p className="text-md font-semibold">About you</p>
             </div>
           </div>
           <hr />
