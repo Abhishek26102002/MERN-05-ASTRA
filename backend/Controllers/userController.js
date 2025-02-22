@@ -300,8 +300,8 @@ export const profilepicUpdate = async (req, res) => {
       });
     }
 
-     // Upload file to Cloudinary
-     const uploadResponse = await new Promise((resolve, reject) => {
+    // Upload file to Cloudinary
+    const uploadResponse = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         { resource_type: "image" },
         (error, result) => {
@@ -397,6 +397,43 @@ export const logout = (req, res) => {
     res.status(200).json({ success: true, message: "Logged out Successfully" });
   } catch (error) {
     console.log("Error in Logout Controller :", error.message);
+    res.status(500).json({ success: false, message: "Internal Server error" });
+  }
+};
+
+export const toggleAdmin = async (req, res) => {
+  const Admin = req.user.is_Admin;
+  const userId = req.params.id;
+
+  if (!Admin) {
+    return res.status(401).json({
+      success: false,
+      message: "You are not Authorized to change user state",
+    });
+  }
+
+  try {
+    const userToUpdate = await Users.findById(userId);
+
+    if (!userToUpdate) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    
+    const updatedUser = await Users.findByIdAndUpdate(
+      userId,
+      { is_Admin: !userToUpdate.is_Admin }, // Toggle the value
+      { new: true }
+    ).select("-password");
+    
+    return res.status(200).json({ //NB: im not sending any user data
+      success: true,
+      message: "User role toggled successfully",
+    });
+  } catch (error) {
+    console.log("Error in toggleAdmin Controller :", error.message);
     res.status(500).json({ success: false, message: "Internal Server error" });
   }
 };

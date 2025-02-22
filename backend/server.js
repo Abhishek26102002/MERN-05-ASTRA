@@ -21,7 +21,7 @@ const app = express();
 app.use(express.json()); // Parse JSON body
 app.use(cookieParser()); // Allows reading cookies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded body
-app.use(cors({ origin: "http://localhost:5174", credentials: true }));
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
 app.use("/images", express.static(path.join(__dirname, "public/images")));
 

@@ -8,7 +8,8 @@ import {
   profilepicUpdate,
   googleAuth,
   checkAuth,
-  logout
+  logout,
+  toggleAdmin
 } from "../Controllers/userController.js";
 import { validateToken } from "../Middlewares/validateToken.js";
 import upload from "../Middlewares/multer.js";
@@ -29,6 +30,8 @@ router.get("/fetchall", validateToken, fetchAllUsers); //Only Admin
 router.get("/checkAuth", validateToken, checkAuth); // user himself
 
 router.put("/update", validateToken, Update);
+
+router.put("/toggleadmin/:id", validateToken, toggleAdmin);
 
 router.put(
   "/profilepicUpdate",
