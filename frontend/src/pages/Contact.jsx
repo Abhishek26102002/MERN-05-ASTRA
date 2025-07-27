@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Mail, User, Send } from "lucide-react";
 import { toast } from "react-hot-toast";
 import emailjs from "@emailjs/browser";
+import Footer from "../components/Footer";
 const Contact = () => {
   const [formData, setFormData] = useState({
     reason: "editorial_tip",
@@ -172,6 +173,7 @@ const Contact = () => {
           </div>
         </div>
       </div>
+      <Footer/>
     </>
   );
 };

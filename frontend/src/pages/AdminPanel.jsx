@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TableOfContents,
   Presentation,
@@ -9,15 +9,23 @@ import {
   SwatchBook,
   Settings,
 } from "lucide-react";
-import AdminPosts from "../components/AdminPosts";
-import AdminUsers from "../components/AdminUsers";
-import AdminStats from "../components/AdminStats";
+import AdminPosts from "../components/Admin/AdminPosts";
+import AdminUsers from "../components/Admin/AdminUsers";
+import AdminStats from "../components/Admin/AdminStats";
 import { Link } from "react-router-dom";
 import Setting from "../pages/Setting";
-import AdminPerformance from "../components/AdminPerformance";
+import AdminPerformance from "../components/Admin/AdminPerformance";
+import AdminSettings from "../components/Admin/AdminSettings";
+import AdminAbout from "../components/Admin/AdminAbout";
+import { UserStore } from "../ApiStore/UserStore";
 
 const AdminPanel = () => {
-  const [activeTab, setActiveTab] = useState("users");
+  const [activeTab, setActiveTab] = useState("stats");
+  const { fetchUsers } = UserStore();
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   return (
     <>
@@ -51,15 +59,15 @@ const AdminPanel = () => {
                     <ul className="menu bg-base-200 text-base-content sm:pt-6 w-48 sm:w-80 gap-3 p-4">
                       {/* Sidebar content here */}
                       <li>
-                        <div className="flex mb-5">
-                          <Link to="/">
+                        <div className="flex">
+                          <Link to="/" className="flex flex-row justify-center items-center">
                             <img
                               className="w-auto h-7"
                               src="./logo04.png"
                               alt=""
                             />
+                          <p className="text-2xl font-semibold ms-4">Astra</p>
                           </Link>
-                          <p className="ms-4 text-2xl font-semibold">Astra</p>
                         </div>
                       </li>
                       <label className="px-3 text-xs text-gray-500 uppercase dark:text-gray-400 ">
@@ -67,19 +75,19 @@ const AdminPanel = () => {
                       </label>
                       <li>
                         <button
-                          className="w-full flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700"
+                          className="w-full flex items-center px-3 py-2 text-secondary transition-colors duration-300 transform rounded-lg hover:text-primary  hover:bg-gray-100 dark:hover:bg-gray-600"
                           onClick={() => setActiveTab("stats")}
                         >
                           <Presentation />
 
-                          <span className="mx-2 text-sm font-medium">
+                          <span className=" mx-2 text-sm font-medium">
                             Stats
                           </span>
                         </button>
                       </li>
                       <li>
                         <button
-                          className="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700"
+                          className="w-full flex items-center px-3 py-2 text-secondary transition-colors duration-300 transform rounded-lg hover:text-primary  hover:bg-gray-100 dark:hover:bg-gray-600"
                           onClick={() => setActiveTab("performance")}
                         >
                           <ChartLine />
@@ -95,7 +103,7 @@ const AdminPanel = () => {
                       <li>
                         {" "}
                         <button
-                          className="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700"
+                          className="w-full flex items-center px-3 py-2 text-secondary transition-colors duration-300 transform rounded-lg hover:text-primary  hover:bg-gray-100 dark:hover:bg-gray-600"
                           onClick={() => setActiveTab("users")}
                         >
                           <UserPen />
@@ -107,7 +115,7 @@ const AdminPanel = () => {
                       </li>
                       <li>
                         <button
-                          className="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700"
+                          className="w-full flex items-center px-3 py-2 text-secondary transition-colors duration-300 transform rounded-lg hover:text-primary  hover:bg-gray-100 dark:hover:bg-gray-600"
                           onClick={() => setActiveTab("posts")}
                         >
                           <GalleryThumbnails />
@@ -119,7 +127,7 @@ const AdminPanel = () => {
                       </li>
                       <li>
                         <button
-                          className="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700"
+                          className="w-full flex items-center px-3 py-2 text-secondary transition-colors duration-300 transform rounded-lg hover:text-primary  hover:bg-gray-100 dark:hover:bg-gray-600"
                           onClick={() => setActiveTab("about")}
                         >
                           <ClipboardList />
@@ -134,7 +142,7 @@ const AdminPanel = () => {
                       </label>
                       <li>
                         <button
-                          className="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700"
+                          className="w-full flex items-center px-3 py-2 text-secondary transition-colors duration-300 transform rounded-lg hover:text-primary  hover:bg-gray-100 dark:hover:bg-gray-600"
                           onClick={() => setActiveTab("theme")}
                         >
                           <SwatchBook />
@@ -146,7 +154,7 @@ const AdminPanel = () => {
                       </li>
                       <li>
                         <button
-                          className="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700"
+                          className="w-full flex items-center px-3 py-2 text-secondary transition-colors duration-300 transform rounded-lg hover:text-primary  hover:bg-gray-100 dark:hover:bg-gray-600"
                           onClick={() => setActiveTab("setting")}
                         >
                           <Settings />
@@ -168,6 +176,8 @@ const AdminPanel = () => {
                   {activeTab === "stats" && <AdminStats />}
                   {activeTab === "theme" && <Setting />}
                   {activeTab === "performance" && <AdminPerformance />}
+                  {activeTab === "setting" && <AdminSettings />}
+                  {activeTab === "about" && <AdminAbout />}
                 </>
               </div>
             </div>

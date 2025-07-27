@@ -11,7 +11,9 @@ import {
   Images,
   Crown,
   ChartNoAxesGantt,
-  FlaskConical
+  FlaskConical,
+  Bell,
+  User,
 } from "lucide-react";
 import { UserStore } from "../ApiStore/UserStore";
 import { useSearch } from "../lib/SearchContext.jsx";
@@ -46,65 +48,77 @@ const Navbar = () => {
                 <ChartNoAxesGantt />
               </label>
             </div>
-            {/* Main menu */}
-            <div
-              role="tablist"
-              className="hidden sm:block tabs tabs-lifted border"
-            >
-              <button
-                role="tab"
-                className={`tab ${activeTab === "home" ? "tab-active" : ""}`}
-                onClick={() => setActiveTab("home")}
-              >
-                <Link to="/" className="flex justify-center items-center gap-2">
-                  <House size={15} />
-                  Home
-                </Link>
-              </button>
-              <button
-                role="tab"
-                className={`tab ${activeTab === "about" ? "tab-active" : ""}`}
-                onClick={() => setActiveTab("about")}
-              >
-                <Link
-                  to="/about"
-                  className="flex justify-center items-center gap-2"
-                >
-                  <NotebookTabs size={15} /> about
-                </Link>
-              </button>
-              <button
-                role="tab"
-                className={`tab ${activeTab === "contact" ? "tab-active" : ""}`}
-                onClick={() => setActiveTab("contact")}
-              >
-                <Link
-                  to="/contact"
-                  className="flex justify-center items-center gap-2"
-                >
-                  <Headset size={15} />
-                  contact
-                </Link>
-              </button>
-              <button
-                role="tab"
-                className={`tab ${activeTab === "test" ? "tab-active" : ""}`}
-                onClick={() => setActiveTab("test")}
-              >
-                <Link
-                  to="/test"
-                  className="flex justify-center items-center gap-2"
-                >
-                  <FlaskConical size={15} />
-                  Test
-                </Link>
-              </button>
-            </div>
 
             <div className="hidden flex-none lg:block">
               {/* Right-side Navigation */}
 
               <div className="flex items-center gap-4">
+                {setuser && (
+                  <div
+                    role="tablist"
+                    className="hidden sm:block tabs tabs-lifted"
+                  >
+                    <button
+                      role="tab"
+                      className={`tab ${
+                        activeTab === "home" ? "tab-active" : ""
+                      }`}
+                      onClick={() => setActiveTab("home")}
+                    >
+                      <Link
+                        to="/"
+                        className="flex justify-center items-center gap-2"
+                      >
+                        <House size={15} />
+                        Home
+                      </Link>
+                    </button>
+                    <button
+                      role="tab"
+                      className={`tab ${
+                        activeTab === "notification" ? "tab-active" : ""
+                      }`}
+                      onClick={() => setActiveTab("notification")}
+                    >
+                      <Link
+                        to="/notifications"
+                        className="flex justify-center items-center gap-2"
+                      >
+                        <NotebookTabs size={15} /> Notifications
+                      </Link>
+                    </button>
+                    <button
+                      role="tab"
+                      className={`tab ${
+                        activeTab === "profile" ? "tab-active" : ""
+                      }`}
+                      onClick={() => setActiveTab("profile")}
+                    >
+                      <Link
+                        to="/dashboard"
+                        className="flex justify-center items-center gap-2"
+                      >
+                        <Headset size={15} />
+                        profile
+                      </Link>
+                    </button>
+                    <button
+                      role="tab"
+                      className={`tab ${
+                        activeTab === "setting" ? "tab-active" : ""
+                      }`}
+                      onClick={() => setActiveTab("setting")}
+                    >
+                      <Link
+                        to="/setting"
+                        className="flex justify-center items-center gap-2"
+                      >
+                        <Settings2 className="w-4 h-4" />
+                        setting
+                      </Link>
+                    </button>
+                  </div>
+                )}
                 <div className="relative">
                   <input
                     type="text"
@@ -119,7 +133,7 @@ const Navbar = () => {
                   // Logged-in state
                   <>
                     {/* Profile Picture Dropdown */}
-                    <div className="flex gap-2 items-center dropdown dropdown-end">
+                    <div className="me-2 flex gap-2 items-center dropdown dropdown-end">
                       <div
                         tabIndex={0}
                         role="button"
@@ -133,35 +147,14 @@ const Navbar = () => {
                       </div>
 
                       <ul className="top-10  menu dropdown-content bg-base-100 rounded-box z-[1] m-5  w-32 p-2 gap-4 shadow">
-                        {setuser?.is_Admin ? (
+                        {setuser?.is_Admin && (
                           <li>
                             <Link to={"/admin"} className={`btn btn-sm gap-2`}>
                               <Crown className="size-5" />
                               <span className="hidden sm:inline">Admin</span>
                             </Link>
                           </li>
-                        ) : (
-                          ""
                         )}
-
-                        <li>
-                          <Link
-                            to={"/dashboard"}
-                            className={`btn btn-sm gap-2`}
-                          >
-                            <CircleUser className="size-5" />
-                            <span className="hidden sm:inline">Profile</span>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to={"/setting"}
-                            className={"btn btn-sm gap-2 transition-colors "}
-                          >
-                            <Settings2 className="w-4 h-4" />
-                            <span className="hidden sm:inline">Settings</span>
-                          </Link>
-                        </li>
                         <li>
                           <button
                             className="flex gap-2 items-center btn btn-sm bg-red-500 hover:bg-red-700 text-white"
@@ -172,9 +165,9 @@ const Navbar = () => {
                           </button>
                         </li>
                       </ul>
-                      <span className="text-md text-gray-600 font-medium">
+                      {/* <span className="text-md text-gray-600 font-medium">
                         {setuser?.name}
-                      </span>
+                      </span> */}
                     </div>
                   </>
                 ) : (
@@ -223,31 +216,13 @@ const Navbar = () => {
                       </div>
 
                       <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] m-5  w-32 p-2 gap-4 shadow">
-                        {setuser.is_Admin ? (
+                        {setuser.is_Admin && (
                           <li>
                             <Link to={"/admin"} className={`btn btn-sm gap-2`}>
                               <Crown className="size-5" />
                             </Link>
                           </li>
-                        ) : (
-                          ""
                         )}
-                        <li>
-                          <Link
-                            to={"/dashboard"}
-                            className={`btn btn-sm gap-2`}
-                          >
-                            <CircleUser className="size-5" />
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to={"/setting"}
-                            className={"btn btn-sm gap-2 transition-colors"}
-                          >
-                            <Settings2 className="w-4 h-4" />
-                          </Link>
-                        </li>
                         <li>
                           <button
                             className="flex gap-2 items-center btn btn-sm bg-red-500 hover:bg-red-700 text-white"
@@ -297,31 +272,31 @@ const Navbar = () => {
             </li>
             <li>
               <Link
-                to="/test"
+                to="/notifications"
                 className="flex gap-2 items-center  btn btn-outline btn-sm hover:text-gray-300"
               >
-                <Images className="size-5" />
-                Blog
+                <Bell className="size-5" />
+                Notifications
               </Link>
             </li>
             <li>
               <Link
-                to="/about"
+                to="/profile"
                 className="flex gap-2 items-center  btn btn-outline btn-sm hover:text-gray-300"
               >
-                <NotebookTabs className="size-5" />
-                About
+                <User className="size-5" />
+                Profile
               </Link>
             </li>
 
             <li>
               {" "}
               <Link
-                to="/contact"
+                to="/setting"
                 className="flex gap-2 items-center  btn btn-outline btn-sm hover:text-gray-300"
               >
-                <Headset className="size-5" />
-                Contact
+                <Settings2 className="w-4 h-4" />
+                Setting
               </Link>
             </li>
           </ul>

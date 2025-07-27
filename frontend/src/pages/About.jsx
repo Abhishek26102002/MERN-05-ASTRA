@@ -1,6 +1,7 @@
 import React from "react";
 import { CircleCheckBig } from "lucide-react";
-import Abhishek from "../components/Abhishek";
+import Footer from "../components/Footer";
+
 
 const About = () => {
 
@@ -94,6 +95,7 @@ const About = () => {
           </div>
         </div>
       </div>
+      <Footer/>
     </>
   );
 };

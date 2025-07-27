@@ -52,7 +52,7 @@ export const UserStore = create((set) => ({
     set({ isLogin: true });
     try {
       const res = await axiosInstance.post("/signup", data);
-      console.log("This is response", res);
+     // console.log("This is response", res);
       set({ setuser: res.data.data });
       toast.success(res.data.message);
     } catch (error) {

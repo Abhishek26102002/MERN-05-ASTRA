@@ -30,7 +30,6 @@ export const PostStore = create((set, get) => ({
       set({ setPost: res.data.data });
     } catch (error) {
       console.log("Error in fetchAllPost userPostStore", error);
-      //   toast.error(error.response.data.message);
     } finally {
       set({ isLoadingPost: false });
     }
@@ -129,8 +128,7 @@ export const PostStore = create((set, get) => ({
 
   likeUnlike: async (postId) => {
     try {
-      const res = await axiosInstance.put(`/post/upvote/${postId}`);
-      toast.success(res.data.message);
+      const res = await axiosInstance.put(`/post/togglelike/${postId}`);
     } catch (error) {
       console.log("Error in fetchuserbyhisid userPostStore", error);
       if (!error.response?.data.success) {
@@ -139,7 +137,19 @@ export const PostStore = create((set, get) => ({
           window.location.href = "/login";
         }, 1000);
       }
-      // toast.error(error.response?.data.message);
+    }
+  },
+  comment: async (postId,data) => {
+    try {
+      return await axiosInstance.put(`/post/createcomment/${postId}`,data);
+    } catch (error) {
+      console.log("Error in createcomment userPostStore", error);
+      if (!error.response?.data.success) {
+        toast.error("You must be logged in to comment on a post");
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 1000);
+      }
     }
   },
 }));

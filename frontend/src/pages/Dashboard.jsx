@@ -79,17 +79,12 @@ const Dashboard = () => {
                 <span>
                   <strong>{setPost?.length ? setPost?.length : 0}</strong> posts
                 </span>
+             
                 <span>
-                  <strong>
-                    {setPost?.upvoters?.length ? setPost?.upvoters?.length : 0}
-                  </strong>{" "}
-                  likes
+                  <strong>0</strong> followers
                 </span>
                 <span>
-                  <strong>121</strong> followers
-                </span>
-                <span>
-                  <strong>191</strong> following
+                  <strong>0</strong> following
                 </span>
               </div>
 

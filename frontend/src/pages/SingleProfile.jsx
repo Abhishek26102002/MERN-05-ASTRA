@@ -74,19 +74,12 @@ const SingleProfile = () => {
                   </strong>{" "}
                   posts
                 </span>
+               
                 <span>
-                  <strong>
-                    {setpostbyuid?.upvoters?.length
-                      ? setpostbyuid?.upvoters?.length
-                      : 0}
-                  </strong>{" "}
-                  likes
+                  <strong>0</strong> followers
                 </span>
                 <span>
-                  <strong>121</strong> followers
-                </span>
-                <span>
-                  <strong>191</strong> following
+                  <strong>0</strong> following
                 </span>
               </div>
 

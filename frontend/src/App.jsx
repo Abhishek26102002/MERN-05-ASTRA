@@ -20,6 +20,8 @@ import Test from "./pages/Test";
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { UserStore } from "./ApiStore/UserStore";
+import Legal from "./pages/Legal";
+import NotificationPage from "./components/NotificationPage";
 
 const App = () => {
   const GID = import.meta.env.VITE_GID;
@@ -47,6 +49,7 @@ const App = () => {
         <Route path="/singleProfile/:id" element={<SingleProfile />} />
         <Route path="/about" element={<About />} />
         <Route path="/test" element={<Test />} />
+        <Route path="/legal" element={<Legal />} />
 
         {/* Default 404 page */}
         <Route path="*" element={<Test />} />
@@ -91,8 +94,14 @@ const App = () => {
             setuser?.is_Admin ? <AdminPanel /> : <Navigate to="/login" />
           }
         />
+        <Route
+          path="/notifications"
+          element={
+           setuser ? <NotificationPage /> : <Navigate to="/login" />
+          }
+        />
       </Routes>
-
+      
       <Toaster />
     </div>
   );

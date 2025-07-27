@@ -5,6 +5,7 @@ import {
   Share2,
   Heart,
   SquareArrowOutUpRight,
+  Bookmark,
 } from "lucide-react";
 import { PostStore } from "../ApiStore/PostStore";
 import { useParams, Link } from "react-router-dom";
@@ -23,7 +24,7 @@ const SingleBlog = () => {
     likeUnlike,
   } = PostStore();
 
-  // console.log(setonepost?.createdBy[0]);
+  // console.log(setonepost?.createdBy);
 
   const { setuser } = UserStore();
 
@@ -33,10 +34,10 @@ const SingleBlog = () => {
 
   //TODO: optimise instant like , already liked or not {working fine if not hard reload}
   useEffect(() => {
-    setonepost?.upvoters[0]?._id.includes(setuser?._id)
+    setonepost?.likes?.some((upvoter) => upvoter?._id === setuser?._id)
       ? setLiked(true)
       : setLiked(false);
-  }, [setonepost?.createdBy[0]._id]); // Runs whenever `createdBy` changes
+  }, [setonepost?.createdBy._id]); // Runs whenever `createdBy` changes
 
   const handleLike = async (postId) => {
     liked ? setLiked(false) : setLiked(true);
@@ -52,23 +53,21 @@ const SingleBlog = () => {
           <div className="bg-base-300 rounded-xl p-6 space-y-8">
             {/* User Info */}
             <Link
-              to={`/singleProfile/${setonepost?.createdBy[0]._id}`}
+              to={`/singleProfile/${setonepost?.createdBy._id}`}
               className="gap-4"
             >
               <div className="flex items-center gap-4 mb-4">
                 <div className="avatar">
                   <div className="w-14 sm:w-20 rounded-full">
                     <img
-                      src={
-                        setonepost?.createdBy[0]?.profilepic || "/profile.png"
-                      }
+                      src={setonepost?.createdBy?.profilepic || "/profile.png"}
                     />
                   </div>
                 </div>
                 <div>
                   <div className="flex gap-6">
                     <p className="font-semibold ">
-                      {setonepost?.createdBy[0]?.name}
+                      {setonepost?.createdBy?.name}
                     </p>
                     <SquareArrowOutUpRight size={20} />
                   </div>
@@ -94,7 +93,7 @@ const SingleBlog = () => {
             <p className=" mb-6">{setonepost?.blogText}</p>
 
             {/* Actions */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-8 sm:gap-6">
               <button
                 className="flex items-center gap-1"
                 onClick={() => handleLike(setonepost._id)}
@@ -102,25 +101,58 @@ const SingleBlog = () => {
                 {liked ? (
                   <>
                     <Heart size={20} className="text-red-500 fill-red-500" />
-                    <p>{setonepost?.upvoters.length + 1}</p>
+                    <p>{setonepost?.likes.length + 1}</p>
                   </>
                 ) : (
                   <>
                     <Heart size={20} />
-                    <p>{setonepost?.upvoters.length}</p>
+                    <p>{setonepost?.likes.length}</p>
                   </>
                 )}
               </button>
-              <button className="flex items-center gap-1 hover:text-red-500">
-                <MessageCircle size={20} /> Comments {setonepost?.comments}
+              <button
+                onClick={() =>
+                  document.getElementById("comment_modal").showModal()
+                }
+                className="flex items-center gap-1 hover:text-red-500"
+              >
+                <MessageCircle size={20} />{" "}
+                <span className="hidden sm:block">Comments</span>
               </button>
               <button className="flex items-center gap-1 hover:text-blue-500">
-                <Share2 size={20} /> Share
+                <Share2 size={20} />{" "}
+                <span className="hidden sm:block">Share</span>
+              </button>
+              <button className="flex items-center gap-1 hover:text-blue-500">
+                <Bookmark size={20} />{" "}
+                <span className="hidden sm:block">Save</span>
               </button>
             </div>
           </div>
         </div>
       </div>
+      {/* Commenst Dialogue */}
+
+      <dialog
+        id="comment_modal"
+        className=" max-h-[70%] p-4 sm:p-6 rounded-lg w-full sm:w-[40vw] max-w-4xl shadow-xl"
+      >
+        <div className="">
+          <h3 className="font-bold text-lg">{setonepost?.title}</h3>
+          <ul className="mt-3">
+            <li>
+              <span className="font-semibold me-2">Abhishek</span>
+              <span>This is awesome post</span>
+            </li>
+          </ul>
+        </div>
+        <form method="dialog">
+          {/* if there is a button in form, it will close the modal */}
+          <button className="btn btn-sm btn-circle bg-white text-black absolute top-1 right-1 ">
+            X
+          </button>
+        </form>
+      </dialog>
     </>
   );
 };
