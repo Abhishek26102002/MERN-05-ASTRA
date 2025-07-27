@@ -5,26 +5,28 @@ import {
   deletePost,
   fetchAllPost,
   updatePost,
-  upcount,
   getcategory,
   getpostbycategoryname,
   fetchAllpostOfUser,
   getUserByHisId,
-  fetchPostByPostId,fetchAllpostByUserId
+  fetchPostById,
+  fetchAllpostByUserId,
+  toggleLike,
+  createComment,
 } from "../Controllers/postController.js";
 import { validateToken } from "../Middlewares/validateToken.js";
 
 const router = express.Router();
 
-router.get("/fetchall", fetchAllPost); 
+router.get("/fetchall", fetchAllPost);
 
-router.get("/fetchonepost/:id", fetchPostByPostId);
+router.get("/fetchonepost/:id", fetchPostById);
 
 router.get("/fetchallpostbyuserid/:id", fetchAllpostByUserId);
 
 router.get("/fetchone", validateToken, fetchAllpostOfUser);
 
-router.get("/getuserbyhisid/:id", getUserByHisId); 
+router.get("/getuserbyhisid/:id", getUserByHisId);
 
 router.get("/getcategory", getcategory);
 
@@ -37,15 +39,16 @@ router.put(
   validateToken,
   upload.single("image"),
   updatePost
-); 
+);
+router.put("/createcomment/:blogId", validateToken, createComment);
 
 router.delete(
   "/deletepost/:id",
   validateToken,
   upload.single("image"),
   deletePost
-); 
+);
 
-router.put("/upvote/:id", validateToken, upcount);
+router.put("/togglelike/:id", validateToken, toggleLike);
 
 export default router;

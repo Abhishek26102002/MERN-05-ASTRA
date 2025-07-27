@@ -1,20 +1,12 @@
 import asyncHandler from "express-async-handler";
-import Blog from "../Models/blogs.js"; // Ensure the correct file extension
-import path from "path";
+import Blog from "../Models/blogs.js";
 import { fileURLToPath } from "url";
 import Users from "../Models/users.js";
-import fs from "fs";
 import cloudinary from "../Config/cloudinary.js";
-// import upload from "../Middlewares/multer.js";
-// import cloudinary from "cloudinary";
+import Notification from "../Models/notification.js";
 
-// Convert __dirname for ES module compatibility
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
-// @desc create a post
-// @route POST /api/createpost
-// @access private (user Specific)
 export const createPost = asyncHandler(async (req, res) => {
   try {
     if (!req.file) {
@@ -83,13 +75,14 @@ export const createPost = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc Get All post Available
-// @route GET /api/getpost
-// @access public
 export const fetchAllPost = asyncHandler(async (req, res) => {
   try {
     // Retrieve all post from the database
-    const blogs = await Blog.find().sort({ createdAt: -1 });
+    const blogs = await Blog.find()
+      .sort({ createdAt: -1 })
+      .populate("createdBy", "name email id profilepic")
+      .populate("likes", "name email id profilepic")
+      .populate("comments.userId", "name email id profilepic");
 
     // Check if users are found
     if (!blogs || blogs.length === 0) {
@@ -111,14 +104,43 @@ export const fetchAllPost = asyncHandler(async (req, res) => {
   //get all Blog
 });
 
-// @desc all post belong to logged in user
-// @route POST /api/register
-// @access private
+// fetch post by post ID
+export const fetchPostById = asyncHandler(async (req, res) => {
+  try {
+    // Retrieve blogs created by a specific user
+    const blogs = await Blog.findOne({ _id: req.params.id })
+      .populate("createdBy", "name email id profilepic")
+      .populate("likes", "name email id profilepic")
+      .populate("comments.userId", "name email id profilepic");
+
+    // Check if any blogs are found
+    if (!blogs || blogs.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No blogs found for this Id",
+      });
+    }
+
+    // Respond with the retrieved blogs
+    return res.status(200).json({
+      success: true,
+      message: "post fetched Successfully",
+      data: blogs,
+    });
+  } catch (error) {
+    console.log("Error in fetchPostByPostId PostController :", error.message);
+    res.status(500).json({ success: false, message: "Internal Server error" });
+  }
+});
+
 export const fetchAllpostOfUser = asyncHandler(async (req, res) => {
   try {
-    const id = req.user.id;
     // Retrieve blogs created by a specific user
-    const blogs = await Blog.find({ "createdBy._id": id }).sort({ createdAt: -1 });
+    const blogs = await Blog.find({ createdBy: req.user.id })
+      .sort({ createdAt: -1 })
+      .populate("createdBy", "name email id profilepic")
+      .populate("likes", "name email id profilepic")
+      .populate("comments.userId", "name email id profilepic");
 
     // Check if any blogs are found
     if (!blogs || blogs.length === 0) {
@@ -138,11 +160,14 @@ export const fetchAllpostOfUser = asyncHandler(async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server error" });
   }
 });
+
 export const fetchAllpostByUserId = asyncHandler(async (req, res) => {
   try {
-    const blogs = await Blog.find({ "createdBy._id": req.params.id }).sort({
-      createdAt: -1,
-    });
+    const blogs = await Blog.find({ createdBy: req.params.id })
+      .sort({ createdAt: -1 })
+      .populate("createdBy", "name email id profilepic")
+      .populate("likes", "name email id profilepic")
+      .populate("comments.userId", "name email id profilepic");
 
     // Check if any blogs are found
     if (!blogs || blogs.length === 0) {
@@ -163,9 +188,6 @@ export const fetchAllpostByUserId = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc
-// @route GET /api/register
-// @access public
 export const getUserByHisId = asyncHandler(async (req, res) => {
   try {
     const user = await Users.find({ _id: req.params.id }).select(
@@ -190,9 +212,6 @@ export const getUserByHisId = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc get category
-// @route POST /api/getcategory
-// @access public
 export const getcategory = asyncHandler(async (req, res) => {
   try {
     // Retrieve blogs created by a specific user
@@ -218,9 +237,6 @@ export const getcategory = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc get post of specifi category (eg. fetch all post that belong to the category MCU)
-// @route POST /api/getpostbycategoryname
-// @access public
 export const getpostbycategoryname = asyncHandler(async (req, res) => {
   const { category } = req.body;
 
@@ -257,12 +273,6 @@ export const getpostbycategoryname = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc update post
-// @route PUT /api/update post
-// @access private
-// update Blog is by specific user we can do that either by jwt or by id but here jwt is best option
-// give jwt
-// give id as http string
 export const updatePost = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params; // Blog ID from request parameters
@@ -278,7 +288,7 @@ export const updatePost = asyncHandler(async (req, res) => {
       });
     }
 
-    const blogCreatorId = blog.createdBy[0]._id.toString(); // Get the first user ID
+    const blogCreatorId = blog.createdBy.toString(); // Get the first user ID
 
     if (blogCreatorId !== userId) {
       return res.status(403).json({
@@ -331,9 +341,6 @@ export const updatePost = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc delete post
-// @route POST /api/deletepost
-// @access private
 export const deletePost = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params; // Blog ID from request parameters
@@ -351,7 +358,7 @@ export const deletePost = asyncHandler(async (req, res) => {
     }
 
     // Check if the authenticated user is the creator or an admin
-    if (blog.createdBy[0]._id.toString() !== userId && !isAdmin) {
+    if (blog.createdBy.toString() !== userId && !isAdmin) {
       return res.status(403).json({
         success: false,
         message: "Forbidden: You are not authorized to delete this blog",
@@ -377,16 +384,73 @@ export const deletePost = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc Like or unlike post
-// @route POST /api/upcount
-// @access private
-export const upcount = asyncHandler(async (req, res) => {
+export const toggleLike = asyncHandler(async (req, res) => {
   try {
-    const { id } = req.params; // Blog ID from request parameters
-    const userId = req.user.id; // Authenticated user ID from JWT
+    const { id } = req.params;
+    const userId = req.user.id; // commig from middleware
 
-    // Find the blog by ID
     const blog = await Blog.findById(id);
+    const currentUser = await Users.findById(userId);
+
+    if (!blog) {
+      return res.status(400).json({
+        success: false,
+        message: "post not found.",
+      });
+    }
+
+    const isAlreadyLiked = blog.likes.some(
+      (like) => like._id.toString() === userId
+    );
+
+    if (!isAlreadyLiked) {
+      blog.likes.push(userId);
+      // create a notification
+      await Notification.create({
+        content: `likes your post ${blog.title}`,
+        createdBy: userId,
+        createdFor: blog.createdBy,
+        type: "LIKE",
+        postId: blog.id,
+      });
+    } else {
+      blog.likes.pull(userId);
+    }
+
+    await blog.save();
+
+    return res.status(200).json({
+      success: true,
+      message: isAlreadyLiked ? "unliked" : "liked",
+    });
+  } catch (error) {
+    console.error("Error in toggleLike PostController:", error.message);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+export const createComment = asyncHandler(async (req, res) => {
+  try {
+    const { blogId } = req.params;
+    const { text } = req.body;
+    const userId = req.user.id;
+
+    if (!blogId) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide blog ID",
+      });
+    }
+
+    if (!text || text.trim().length < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a comment at least 1 character long",
+      });
+    }
+
+    const blog = await Blog.findById(blogId);
+    const currentUser = await Users.findById(userId);
 
     if (!blog) {
       return res.status(404).json({
@@ -395,78 +459,28 @@ export const upcount = asyncHandler(async (req, res) => {
       });
     }
 
-    // Find the user details
-    const user = await Users.findById(userId).select(
-      "_id name profilepic email"
-    );
+    blog.comments.push({
+      userId,
+      text: text.trim(),
+    });
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
+    const updatedBlog = await blog.save({ validateModifiedOnly: true });
 
-    // Ensure upvoters is initialized as an array
-    blog.upvoters = blog.upvoters || [];
-
-    // Check if user has already upvoted
-    const userIndex = blog.upvoters.findIndex(
-      (upvoter) => upvoter._id.toString() === userId
-    );
-
-    if (userIndex === -1) {
-      // User hasn't upvoted, increment count and add user details to upvoters
-      blog.blogUpPoint = (blog.blogUpPoint || 0) + 1;
-      blog.upvoters.push({
-        _id: user._id,
-        name: user.name,
-        profilepic: user.profilepic,
-        email: user.email,
-      });
-    } else {
-      // User has already upvoted, decrement count and remove user from upvoters
-      blog.blogUpPoint = Math.max((blog.blogUpPoint || 0) - 1, 0);
-      blog.upvoters.splice(userIndex, 1);
-    }
-
-    // Save the updated blog
-    await blog.save();
+    await Notification.create({
+      content: `comment your post ${blog.title} '${text}'`,
+      createdBy: userId,
+      createdFor: blog.createdBy,
+      type: "COMMENT",
+      postId: blog.id,
+    });
 
     res.status(200).json({
       success: true,
-      message: userIndex === -1 ? "Liked" : "UnLiked",
-      data: {
-        blogUpPoint: blog.upvoters.length,
-        upvoters: blog.upvoters,
-      },
+      message: "Comment added successfully",
+      data: updatedBlog,
     });
   } catch (error) {
-    console.error("Error in upcount PostController:", error.message);
-    res.status(500).json({ success: false, message: "Internal Server error" });
-  }
-});
-
-export const fetchPostByPostId = asyncHandler(async (req, res) => {
-  try {
-    // Retrieve blogs created by a specific user
-    const blogs = await Blog.findOne({ _id: req.params.id });
-
-    // Check if any blogs are found
-    if (!blogs || blogs.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No blogs found for this Id",
-      });
-    }
-
-    // Respond with the retrieved blogs
-    res.status(200).json({
-      success: true,
-      data: blogs,
-    });
-  } catch (error) {
-    console.log("Error in fetchPostByPostId PostController :", error.message);
-    res.status(500).json({ success: false, message: "Internal Server error" });
+    console.error("Error in createComment PostController:", error.message);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });

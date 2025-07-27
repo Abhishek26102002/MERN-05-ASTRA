@@ -9,7 +9,9 @@ import {
   googleAuth,
   checkAuth,
   logout,
-  toggleAdmin
+  toggleAdmin,
+  toggleFollow,
+  isFollowing
 } from "../Controllers/userController.js";
 import { validateToken } from "../Middlewares/validateToken.js";
 import upload from "../Middlewares/multer.js";
@@ -39,6 +41,13 @@ router.put(
   validateToken,
   profilepicUpdate
 );
+router.put(
+  "/follow",
+  validateToken,
+  toggleFollow
+);
+
+router.post("/",validateToken,isFollowing)
 
 router.delete("/userdelete", validateToken, userdelete);
 

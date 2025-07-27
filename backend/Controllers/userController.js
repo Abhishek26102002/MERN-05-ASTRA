@@ -5,9 +5,8 @@ import jwt from "jsonwebtoken";
 import cloudinary from "../Config/cloudinary.js";
 import oauth2Client from "../utils/googleClient.utils.js";
 import { generateToken } from "../utils/token.utils.js";
-// @desc fetch all user
-// @route GET /api/getuser
-// @access private (only admin can access)
+import Notifications from "../Models/notification.js";
+
 export const fetchAllUsers = asyncHandler(async (req, res) => {
   if (req.user.is_Admin !== true) {
     return res.status(403).json({
@@ -39,9 +38,6 @@ export const fetchAllUsers = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc register a user
-// @route POST /api/register
-// @access public
 export const Signup = asyncHandler(async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -129,9 +125,6 @@ export const Signup = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc login a user
-// @route POST /api/login
-// @access public
 export const Login = asyncHandler(async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -159,6 +152,7 @@ export const Login = asyncHandler(async (req, res) => {
           email: user.email,
           profilepic: user.profilepic,
           createdAt: user.createdAt,
+          is_Admin: user.is_Admin,
         },
       });
     } else {
@@ -224,9 +218,6 @@ export const googleAuth = async (req, res) => {
   }
 };
 
-// @desc update a user
-// @route PUT /api/login
-// @access public
 export const Update = asyncHandler(async (req, res) => {
   try {
     const { email, name, password } = req.body;
@@ -376,9 +367,6 @@ export const userdelete = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc fetch himself
-// @route POST /api/checkAuth
-// @access private
 export const checkAuth = (req, res) => {
   try {
     res.status(200).json({
@@ -421,19 +409,129 @@ export const toggleAdmin = async (req, res) => {
         message: "User not found",
       });
     }
-    
-    const updatedUser = await Users.findByIdAndUpdate(
+
+    await Users.findByIdAndUpdate(
       userId,
       { is_Admin: !userToUpdate.is_Admin }, // Toggle the value
       { new: true }
-    ).select("-password");
-    
-    return res.status(200).json({ //NB: im not sending any user data
+    );
+
+    return res.status(200).json({
       success: true,
       message: "User role toggled successfully",
     });
   } catch (error) {
     console.log("Error in toggleAdmin Controller :", error.message);
     res.status(500).json({ success: false, message: "Internal Server error" });
+  }
+};
+
+export const toggleFollow = async (req, res) => {
+  try {
+    const { followingId } = req.body;
+    const userId = req.user.id;
+
+    if (!followingId) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide followingId",
+      });
+    }
+
+    if (userId === followingId) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot follow yourself",
+      });
+    }
+
+    const currentUser = await Users.findById(userId);
+    const followingUser = await Users.findById(followingId);
+
+    if (!currentUser || !followingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const isAlreadyFollowing = currentUser.following.some(
+      (f) => f._id.toString() === followingId
+    );
+
+    if (isAlreadyFollowing) {
+      // Unfollow
+      currentUser.following.pull(followingId);
+      followingUser.follower.pull(userId);
+    } else {
+      // Follow
+      currentUser.following.push(followingId);
+      followingUser.follower.push(userId);
+
+      // create notification for the follower
+      await Notifications.create({
+        content: `you got a new follower ${currentUser.name}`,
+        createdBy: userId,
+        createdFor: followingId,
+        type: "FOLLOW",
+      });
+    }
+
+    await currentUser.save();
+    await followingUser.save();
+
+    return res.status(200).json({
+      success: true,
+      message: isAlreadyFollowing ? "Unfollowed" : "Followed",
+      data: {
+        currentUserId: currentUser._id,
+        followingId: followingUser._id,
+      },
+    });
+  } catch (error) {
+    console.error("Error in toggleFollow Controller:", error.message);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+export const isFollowing = async (req, res) => {
+  try {
+    const { followingId } = req.body;
+    const userId = req.user.id;
+
+    if (!followingId) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide followingId",
+      });
+    }
+
+    if (userId === followingId) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot follow yourself",
+      });
+    }
+
+    const currentUser = await Users.findById(userId);
+    const followingUser = await Users.findById(followingId);
+
+    if (!currentUser || !followingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const isAlreadyFollowing = currentUser.following.some(
+      (f) => f._id.toString() === followingId
+    );
+
+    return res.status(200).json({
+      response: isAlreadyFollowing,
+    });
+  } catch (error) {
+    console.error("Error in isFollowing Controller:", error.message);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };

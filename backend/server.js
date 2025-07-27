@@ -8,6 +8,7 @@ import userRouter from "./Routes/userRoute.js";
 import postRouter from "./Routes/postRoute.js";
 import { mail } from "./Controllers/mailController.js";
 import cookieParser from "cookie-parser";
+import notificationRoute from "./Routes/notificationRoute.js"
 
 dotenv.config();
 
@@ -33,6 +34,8 @@ app.use("/images", express.static(path.join(__dirname, "public/images")));
 app.use("/api", userRouter);
 
 app.use("/api/post", postRouter);
+
+app.use("/api/notification",notificationRoute)
 
 app.use("/sendmail", mail);
 
