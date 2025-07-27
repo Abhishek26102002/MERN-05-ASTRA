@@ -18,7 +18,7 @@ const Home = () => {
   const filteredPosts = setallpost?.filter(
     (post) =>
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.blogText.toLowerCase().includes(searchQuery.toLowerCase())
+      post.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
   const [isMobile, setIsMobile] = useState(false);
 
