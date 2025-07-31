@@ -169,14 +169,6 @@ export const fetchAllpostByUserId = asyncHandler(async (req, res) => {
       .populate("likes", "name email id profilepic")
       .populate("comments.userId", "name email id profilepic");
 
-    // Check if any blogs are found
-    if (!blogs || blogs.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No blogs found for this user",
-      });
-    }
-
     // Respond with the retrieved blogs
     res.status(200).json({
       success: true,
@@ -191,7 +183,7 @@ export const fetchAllpostByUserId = asyncHandler(async (req, res) => {
 export const getUserByHisId = asyncHandler(async (req, res) => {
   try {
     const user = await Users.find({ _id: req.params.id }).select(
-      "-password -is_Admin -_id -createdAt -updatedAt -__v"
+      "-password"
     );
     // Check if any blogs are found
     if (!user || user.length === 0) {
@@ -406,13 +398,23 @@ export const toggleLike = asyncHandler(async (req, res) => {
     if (!isAlreadyLiked) {
       blog.likes.push(userId);
       // create a notification
-      await Notification.create({
-        content: `likes your post ${blog.title}`,
-        createdBy: userId,
-        createdFor: blog.createdBy,
-        type: "LIKE",
-        postId: blog.id,
-      });
+      if (userId != blog.createdBy) {
+        const newNoti = await Notification.findOne({
+          postId: blog.id,
+          createdBy: userId,
+          createdFor: blog.createdBy,
+          type: "LIKE",
+        });
+        if (!newNoti) {
+          await Notification.create({
+            content: `likes your post ${blog.title}`,
+            createdBy: userId,
+            createdFor: blog.createdBy,
+            type: "LIKE",
+            postId: blog.id,
+          });
+        }
+      }
     } else {
       blog.likes.pull(userId);
     }
@@ -450,7 +452,7 @@ export const createComment = asyncHandler(async (req, res) => {
     }
 
     const blog = await Blog.findById(blogId);
-    const currentUser = await Users.findById(userId);
+    //  const currentUser = await Users.findById(userId);
 
     if (!blog) {
       return res.status(404).json({
@@ -466,13 +468,23 @@ export const createComment = asyncHandler(async (req, res) => {
 
     const updatedBlog = await blog.save({ validateModifiedOnly: true });
 
-    await Notification.create({
-      content: `comment your post ${blog.title} '${text}'`,
-      createdBy: userId,
-      createdFor: blog.createdBy,
-      type: "COMMENT",
-      postId: blog.id,
-    });
+    if (userId != blog.createdBy) {
+      const newNoti = await Notification.findOne({
+        postId: blog.id,
+        createdBy: userId,
+        createdFor: blog.createdBy,
+        type: "COMMENT",
+      });
+      if (!newNoti) {
+        await Notification.create({
+          content: `comment your post ${blog.title} '${text}'`,
+          createdBy: userId,
+          createdFor: blog.createdBy,
+          type: "COMMENT",
+          postId: blog.id,
+        });
+      }
+    }
 
     res.status(200).json({
       success: true,

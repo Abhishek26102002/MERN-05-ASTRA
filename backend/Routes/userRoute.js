@@ -47,7 +47,7 @@ router.put(
   toggleFollow
 );
 
-router.post("/",validateToken,isFollowing)
+router.post("/isfollowing",validateToken,isFollowing)
 
 router.delete("/userdelete", validateToken, userdelete);
 

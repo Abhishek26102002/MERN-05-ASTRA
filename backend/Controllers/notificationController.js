@@ -7,9 +7,28 @@ export const getNotification = async (req, res) => {
 
     const Notification = await Notifications.find({ createdFor: userId })
       .sort({ createdAt: -1 })
-      .populate("createdBy", "id name email profilepic")
-      .populate("postId", "id image title comments");
-
+      .populate({
+        path: "createdBy",
+        select: "id name email profilepic",
+      })
+      .populate({
+        path: "postId",
+        select: "id image title comments likes description createdBy",
+        populate: [
+          {
+            path: "createdBy",
+            select: "name email id profilepic",
+          },
+          {
+            path: "likes",
+            select: "name email id profilepic",
+          },
+          {
+            path: "comments.userId",
+            select: "name email id profilepic",
+          },
+        ],
+      });
     if (Notification.length <= 0) {
       return res.status(200).json({
         success: true,

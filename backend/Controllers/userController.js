@@ -468,13 +468,22 @@ export const toggleFollow = async (req, res) => {
       currentUser.following.push(followingId);
       followingUser.follower.push(userId);
 
-      // create notification for the follower
-      await Notifications.create({
-        content: `you got a new follower ${currentUser.name}`,
-        createdBy: userId,
-        createdFor: followingId,
-        type: "FOLLOW",
-      });
+      if (userId !== followingId) {
+        const newNoti = await Notifications.findOne({
+          createdBy: userId,
+          createdFor: followingId,
+          type: "FOLLOW",
+        });
+        if (!newNoti) {
+          // create notification for the follower
+          await Notifications.create({
+            content: `you got a new follower ${currentUser.name}`,
+            createdBy: userId,
+            createdFor: followingId,
+            type: "FOLLOW",
+          });
+        }
+      }
     }
 
     await currentUser.save();
@@ -507,9 +516,10 @@ export const isFollowing = async (req, res) => {
     }
 
     if (userId === followingId) {
-      return res.status(400).json({
+      return res.status(200).json({
         success: false,
-        message: "You cannot follow yourself",
+        message:"you cannot follow yourself",
+        response:false
       });
     }
 
