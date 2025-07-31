@@ -17,11 +17,19 @@ import {
 } from "lucide-react";
 import { UserStore } from "../ApiStore/UserStore";
 import { useSearch } from "../lib/SearchContext.jsx";
+import { NotificationStore } from "../ApiStore/NotificationStore.js";
 
 const Navbar = () => {
   const { searchQuery, setSearchQuery } = useSearch();
-  const { setuser, logout } = UserStore();
+  const { setuser, logout, checkAuth } = UserStore();
   const [activeTab, setActiveTab] = useState("home");
+  const { fetchAllNotification, notifications } = NotificationStore();
+
+  useEffect(() => {
+    checkAuth();
+    setuser;
+    fetchAllNotification();
+  }, []);
 
   return (
     <>
@@ -85,6 +93,17 @@ const Navbar = () => {
                         className="flex justify-center items-center gap-2"
                       >
                         <NotebookTabs size={15} /> Notifications
+                        {notifications?.filter((n) => !n.isMarkRead).length >
+                          0 && (
+                          <div className="bg-red-600 w-5 h-5 rounded-full absolute -top-2 -right-2 text-white justify-center items-center flex text-[10px]">
+                            {notifications?.filter((n) => !n.isMarkRead)
+                              .length < 99
+                              ? notifications?.filter((n) => !n.isMarkRead)
+                                  .length
+                              : notifications?.filter((n) => !n.isMarkRead)
+                                  .length + "+"}
+                          </div>
+                        )}
                       </Link>
                     </button>
                     <button
@@ -95,7 +114,7 @@ const Navbar = () => {
                       onClick={() => setActiveTab("profile")}
                     >
                       <Link
-                        to="/dashboard"
+                        to={`/dashboard/${setuser?._id}`}
                         className="flex justify-center items-center gap-2"
                       >
                         <Headset size={15} />
@@ -281,7 +300,7 @@ const Navbar = () => {
             </li>
             <li>
               <Link
-                to="/profile"
+                to={`/dashboard/${setuser?._id}`}
                 className="flex gap-2 items-center  btn btn-outline btn-sm hover:text-gray-300"
               >
                 <User className="size-5" />

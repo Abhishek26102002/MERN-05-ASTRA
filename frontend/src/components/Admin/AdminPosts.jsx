@@ -74,7 +74,7 @@ const AdminPosts = () => {
                   <div className="flex flex-col">
                     <span>postId: {post?._id}</span>
                     <br />
-                    <Link to={`/singleProfile/${post?.createdBy._id}`}>
+                    <Link to={`/dashboard/${post?.createdBy._id}`}>
                       <div className="flex flex-col ">
                         <span className="text-gray-500 hover:text-primary">
                           UserId : {post?.createdBy._id}

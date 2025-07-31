@@ -14,7 +14,6 @@ import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Setting from "./pages/Setting";
 import Signup from "./pages/Signup";
-import SingleBlog from "./pages/SingleBlog";
 import SingleProfile from "./pages/SingleProfile";
 import Test from "./pages/Test";
 
@@ -25,7 +24,6 @@ import NotificationPage from "./components/NotificationPage";
 
 const App = () => {
   const GID = import.meta.env.VITE_GID;
-
   const { theme } = useThemeStore();
   const { setuser, checkAuth } = UserStore();
 
@@ -45,7 +43,6 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/setting" element={<Setting />} />
-        <Route path="/singleblog/:id" element={<SingleBlog />} />
         <Route path="/singleProfile/:id" element={<SingleProfile />} />
         <Route path="/about" element={<About />} />
         <Route path="/test" element={<Test />} />
@@ -81,7 +78,7 @@ const App = () => {
         {/* When Logged out cannot visit */}
 
         <Route
-          path="/dashboard"
+          path="/dashboard/:id"
           element={setuser ? <Dashboard /> : <Navigate to="/login" />}
         />
         <Route
@@ -96,12 +93,10 @@ const App = () => {
         />
         <Route
           path="/notifications"
-          element={
-           setuser ? <NotificationPage /> : <Navigate to="/login" />
-          }
+          element={setuser ? <NotificationPage /> : <Navigate to="/login" />}
         />
       </Routes>
-      
+
       <Toaster />
     </div>
   );

@@ -6,11 +6,11 @@ import { PostStore } from "../../ApiStore/PostStore";
 import { Link } from "react-router-dom";
 const HomeMobile = ({ SinglePost }) => {
   const { setuser } = UserStore();
-  const { likeUnlike } = PostStore();
+  const { likeUnlike,comment } = PostStore();
   const [newComment, setNewComment] = useState("");
   const [isCommenting, setIsCommenting] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [hasLiked, setHasLiked] = useState(
     SinglePost.likes.some((like) => like._id === setuser?._id)
   );
@@ -18,7 +18,10 @@ const HomeMobile = ({ SinglePost }) => {
     SinglePost.likes.length
   );
   const [showComments, setShowComments] = useState(false);
-
+  const [formData, setFormData] = useState({
+    text: "",
+  });
+  const toggleReadMore = () => setIsExpanded((prev) => !prev);
   const handleLike = async () => {
     if (isLiking) return;
     try {
@@ -42,35 +45,45 @@ const HomeMobile = ({ SinglePost }) => {
       ? "Invalid date"
       : `${formatDistanceToNowStrict(date)} ago`;
   };
+  const isSubmitDisabled = !formData.text.trim();
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    setFormData({ text: "" });
+    SinglePost.comments.push({
+      userId: {
+        _id: setuser._id,
+        name: setuser.name,
+        profilepic: setuser.profilepic,
+      },
+      text: formData.text,
+      createdAt:`${new Date()}`
+    });
+    await comment(SinglePost._id, formData);
+  };
   return (
     <>
       <div className="bg-white shadow-md rounded-lg p-4 space-y-4 w-full">
         {/* Header */}
         <div className="flex gap-3">
-          <a href={`/singleProfile/${SinglePost?.createdBy?._id}`}>
+          <Link to={`/dashboard/${SinglePost?.createdBy?._id}`}>
             <div className="avatar">
               <div className="w-10 rounded-full">
                 <img src={SinglePost.createdBy?.profilepic || "/avatar.png"} />
               </div>
             </div>
-          </a>
+          </Link>
 
           <div className="flex-1">
             <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 truncate">
-              <a
-                href={`/singleProfile/${SinglePost?.createdBy?._id}`}
-                className="font-semibold"
-              >
-                {SinglePost.createdBy?.name}
-              </a>
+              <Link to={`/dashboard/${SinglePost?.createdBy?._id}`}>
+                <p className="font-semibold">{SinglePost.createdBy?.name}</p>
+              </Link>
               <div className="text-sm text-gray-500 flex items-center gap-1">
-                <a href={`/singleProfile/${SinglePost?.createdBy?._id}`}>
+                <a href={`/dashboard/${SinglePost?.createdBy?._id}`}>
                   @{SinglePost.createdBy?.name}
                 </a>
                 <span>•</span>
-                <span>
-                  {new Date(SinglePost.createdAt).toLocaleDateString()}
-                </span>
+                <span>{formatTimeAgo(SinglePost.createdAt)}</span>
               </div>
             </div>
           </div>
@@ -82,16 +95,22 @@ const HomeMobile = ({ SinglePost }) => {
         {/* Post Image */}
         {SinglePost.image && (
           <div className="rounded-lg overflow-hidden">
-            <Link to={`/singleblog/${SinglePost._id}`}>
-              <img
-                src={SinglePost.image}
-                alt="Post"
-                className="w-full h-auto object-cover"
-              />
-              <p className="text-sm text-gray-700 mt-2">
-                {SinglePost.description.slice(0, 55)}... read more
-              </p>
-            </Link>
+            <img
+              src={SinglePost.image}
+              alt="Post"
+              className="w-full h-auto object-cover"
+            />
+            <p className="text-sm text-gray-700 mt-2">
+              {isExpanded
+                ? SinglePost?.description
+                : `${SinglePost?.description.slice(0, 55)}... `}
+              <button
+                onClick={toggleReadMore}
+                className="text-blue-500 hover:underline ml-1"
+              >
+                {isExpanded ? "show less" : "read more"}
+              </button>
+            </p>
           </div>
         )}
 
@@ -126,43 +145,45 @@ const HomeMobile = ({ SinglePost }) => {
             {SinglePost.comments.map((comment) => (
               <div key={comment.id} className="flex gap-3">
                 <div className="avatar">
-                  <div className="w-8 rounded-full">
-                    <img src={comment.createdBy?.profilepic || "/avatar.png"} />
+                  <div className="w-9 h-9 rounded-full">
+                    <img src={comment.userId?.profilepic || "/avatar.png"} />
                   </div>
                 </div>
                 <div className="flex-1">
                   <div className="flex gap-2 flex-wrap text-sm text-gray-500">
                     <span className="text-black font-medium">
-                      {comment.createdBy?.name}
+                      {comment.userId?.name}
                     </span>
-                    <span>@{comment.createdBy?.name}</span>
+                    <span>@{comment.userId.name}</span>
                     <span>•</span>
-                    <span>{formatTimeAgo(comment.createdAt)}</span>
+                    <span>{formatTimeAgo(comment?.createdAt)}</span>
                   </div>
-                  <p className="text-sm">{comment.content}</p>
+                  <p className="text-sm">{comment?.text}</p>
                 </div>
               </div>
             ))}
 
-            {user ? (
+            {setuser ? (
               <div className="flex gap-3">
                 <div className="avatar">
-                  <div className="w-8 rounded-full">
-                    <img src={user.imageUrl || "/avatar.png"} />
+                  <div className="w-9 h-9 rounded-full">
+                    <img src={setuser?.profilepic || "/avatar.png"} />
                   </div>
                 </div>
                 <div className="flex-1">
                   <textarea
                     className="textarea textarea-bordered w-full h-20"
                     placeholder="Write a comment..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
+                    value={formData.text}
+                    onChange={(e) =>
+                      setFormData({ ...formData, text: e.target.value })
+                    }
                   />
                   <div className="flex justify-end mt-2">
                     <button
                       className="btn btn-sm btn-primary flex items-center gap-2"
                       onClick={handleAddComment}
-                      disabled={!newComment.trim() || isCommenting}
+                      disabled={isSubmitDisabled}
                     >
                       {isCommenting ? (
                         "Posting..."

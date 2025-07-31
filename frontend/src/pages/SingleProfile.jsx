@@ -15,12 +15,14 @@ const SingleProfile = () => {
   const { isLoading, setuser } = UserStore();
   const [activeTab, setActiveTab] = useState("posts");
   const {
-    setpostbyuid,
     isLoadingPost,
     fetchpostbyuserid,
     setpostuser,
     fetchuserbyhisid,
+    setPost
   } = PostStore();
+
+  const     setpostbyuid=setPost;
 
   useEffect(() => {
     if (id === setuser?._id) {

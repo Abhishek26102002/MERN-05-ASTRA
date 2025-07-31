@@ -7,6 +7,7 @@ export const UserStore = create((set) => ({
   allUsers: null,
   isLoading: false,
   isLogin: false,
+  setIsFollow: false,
 
   checkAuth: async () => {
     try {
@@ -52,7 +53,7 @@ export const UserStore = create((set) => ({
     set({ isLogin: true });
     try {
       const res = await axiosInstance.post("/signup", data);
-     // console.log("This is response", res);
+      // console.log("This is response", res);
       set({ setuser: res.data.data });
       toast.success(res.data.message);
     } catch (error) {
@@ -140,14 +141,35 @@ export const UserStore = create((set) => ({
     }
   },
   adminToggle: async (userId) => {
-
     try {
       const res = await axiosInstance.put(`/toggleadmin/${userId}`);
       toast.success(res.data.message);
     } catch (error) {
       console.log("Error in adminToggle userStore", error);
       toast.error(error.response?.data?.message || "Failed !");
-    } 
+    }
   },
-
+  toggleFollow: async (followingId) => {
+    try {
+      const res = await axiosInstance.put("/follow", {
+        followingId,
+      });
+      toast.success(res.data.message);
+    } catch (error) {
+      console.log("Error in adminToggle userStore", error);
+      toast.error(error.response?.data?.message || "Failed !");
+    }
+  },
+  isFollowing: async (followingId) => {
+    try {
+      const res = await axiosInstance.post("/isfollowing", {
+        followingId,
+      });
+      set({ setIsFollow: res.data.response });
+    } catch (error) {
+      set({ setIsFollow: null });
+      console.log("Error in isFollowing userStore", error);
+     // toast.error(error.response.data.message);
+    }
+  },
 }));

@@ -69,7 +69,7 @@ const PieChart = () => {
   }, []);
 
   return (
-    <div className="font-sans w-[100%] sm:w-96">
+    <div className="font-sans w-full sm:w-96 z-0">
       <div className="card bg-base-100 shadow-xl p-6">
         <div className="relative h-64">
           <canvas ref={chartRef} className="w-32" />

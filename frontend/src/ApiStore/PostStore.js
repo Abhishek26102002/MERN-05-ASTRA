@@ -18,7 +18,7 @@ export const PostStore = create((set, get) => ({
       set({ setallpost: res.data.data });
     } catch (error) {
       console.log("Error in fetchAllPost userPostStore", error);
-      toast.error(error.response?.data.message);
+     // toast.error(error.response?.data.message);
     } finally {
       set({ isLoadingPost: false });
     }
@@ -41,7 +41,7 @@ export const PostStore = create((set, get) => ({
       set({ setonepost: res.data.data });
     } catch (error) {
       console.log("Error in fetchAllPost userPostStore", error);
-      toast.error(error.response?.data.message);
+      //toast.error(error.response?.data.message);
     } finally {
       set({ isLoadingPost: false });
     }
@@ -52,10 +52,10 @@ export const PostStore = create((set, get) => ({
       const res = await axiosInstance.get(
         `/post/fetchallpostbyuserid/${userId}`
       );
-      set({ setpostbyuid: res.data.data });
+      set({ setPost: res.data.data });
     } catch (error) {
       console.log("Error in fetchAllPost userPostStore", error);
-      toast.error(error.response?.data.message);
+     // toast.error(error.response?.data.message);
     } finally {
       set({ isLoadingPost: false });
     }
@@ -141,15 +141,11 @@ export const PostStore = create((set, get) => ({
   },
   comment: async (postId,data) => {
     try {
-      return await axiosInstance.put(`/post/createcomment/${postId}`,data);
+      console.log("Backend : ",postId," and data :",data);
+      
+       await axiosInstance.put(`/post/createcomment/${postId}`,data);
     } catch (error) {
       console.log("Error in createcomment userPostStore", error);
-      if (!error.response?.data.success) {
-        toast.error("You must be logged in to comment on a post");
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 1000);
-      }
     }
   },
 }));

@@ -5,9 +5,11 @@ import PieChart from "./PieChart";
 const AdminStats = () => {
   return (
     <>
-      <div className="flex flex-col gap-4">
+       <div className="w-full overflow-x-auto">
+        <div className="mb-8">
         <WelcomeAdmin />
-        <PieChart />
+        </div>
+      
       </div>
     </>
   );

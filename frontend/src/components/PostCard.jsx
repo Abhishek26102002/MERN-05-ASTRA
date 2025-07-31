@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Heart, ChevronDown } from "lucide-react";
 import { UserStore } from "../ApiStore/UserStore";
 import { PostStore } from "../ApiStore/PostStore";
+import PostViewModal from "./PostViewModal";
 const PostCard = ({
   SinglePost,
   isReverse,
@@ -16,17 +17,14 @@ const PostCard = ({
 }) => {
   const { setuser } = UserStore();
   const { likeUnlike } = PostStore();
-  const [newComment, setNewComment] = useState("");
-  const [isCommenting, setIsCommenting] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [hasLiked, setHasLiked] = useState(
     SinglePost.likes.some((like) => like._id === setuser?._id)
   );
   const [optimisticLikes, setOptmisticLikes] = useState(
     SinglePost.likes.length
   );
-  const [showComments, setShowComments] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const handleLike = async () => {
     if (isLiking) return;
@@ -35,7 +33,7 @@ const PostCard = ({
       setHasLiked((prev) => !prev);
       setOptmisticLikes((prev) => prev + (hasLiked ? -1 : 1));
       console.log("Liked");
-      
+
       await likeUnlike(SinglePost._id);
     } catch (error) {
       setOptmisticLikes(SinglePost.likes.length);
@@ -59,15 +57,13 @@ const PostCard = ({
             BottomBroder ? "flex gap-4 p-4 border-b" : "flex gap-4 p-4"
           }
         >
-          <div className="relative">
+          <div className="relative" onClick={() => setShowModal(true)}>
             {!isReverse && (
-              <Link to={`/singleblog/${SinglePost._id}`}>
-                <img
-                  src={SinglePost.image}
-                  alt="Post"
-                  className={ImageSize && `${ImageSize} rounded-lg`}
-                />
-              </Link>
+              <img
+                src={SinglePost.image}
+                alt="Post"
+                className={ImageSize && `${ImageSize} rounded-lg`}
+              />
             )}
             {Rank && (
               <div className="absolute bottom-0 left-0 bg-white px-2 py-1 text-blue-600 text-3xl font-bold w-15">
@@ -89,7 +85,7 @@ const PostCard = ({
               )}
               <div className="flex flex-col">
                 <div className="flex flex-row">
-                  <Link to={`/singleProfile/${SinglePost?.createdBy?._id}`}>
+                  <Link to={`/dashboard/${SinglePost?.createdBy?._id}`}>
                     <div className="flex pe-1 items-center border border-gray-300 rounded-full">
                       <div className="avatar">
                         <div className="w-7 rounded-full">
@@ -141,16 +137,19 @@ const PostCard = ({
             </div>
           </div>
           {isReverse && (
-            <Link to={`/singleblog/${SinglePost._id}`}>
+            <div onClick={() => setShowModal(true)}>
               <img
                 src={SinglePost.image}
                 alt="Post"
                 className={ImageSize && `${ImageSize} rounded-lg`}
               />
-            </Link>
+            </div>
           )}
         </div>
       </div>
+      {showModal && (
+        <PostViewModal post={SinglePost} onClose={() => setShowModal(false)} />
+      )}
     </div>
   );
 };

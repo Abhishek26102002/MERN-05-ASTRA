@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Settings, SquarePlus } from "lucide-react";
 import { UserStore } from "../ApiStore/UserStore";
 import { PostStore } from "../ApiStore/PostStore";
-import { Link } from "react-router-dom";
+import { Link, useParams, Navigate } from "react-router-dom";
 import CreatePost from "../components/CreatePost";
 import UserPost from "../components/UserPost";
 import UserSkeleton from "../components/skeleton/UserSkeleton";
@@ -11,18 +11,56 @@ import UserSavedPost from "../components/UserSavedPost";
 import UserLikedPost from "../components/UserLikedPost";
 
 const Dashboard = () => {
-  const { isLoading, setuser } = UserStore();
+  const { id } = useParams();
+  const {
+    isLoading,
+    setuser,
+    checkAuth,
+    toggleFollow,
+    isFollowing,
+    setIsFollow,
+  } = UserStore();
   const [activeTab, setActiveTab] = useState("posts");
-  const { setPost, fetchLoggedInUserPost, isLoadingPost, deletePost } =
-    PostStore();
+  const {
+    setPost,
+    isLoadingPost,
+    fetchpostbyuserid,
+    setpostuser,
+    fetchuserbyhisid,
+  } = PostStore();
+  const [Following, setFollowing] = useState(false);
 
   useEffect(() => {
-    fetchLoggedInUserPost();
-  }, []);
+    checkAuth();
+    setuser;
+  }, [id]);
+
+  const isOwner = id === setuser?._id;
+
+  useEffect(() => {
+    isFollowing(id);
+    fetchuserbyhisid(id);
+    fetchpostbyuserid(id);
+  }, [Navigate, id]);
+
+  
+  useEffect(() => {
+    setFollowing(setIsFollow);
+  }, [Navigate, id]);
+
+  console.log(Following);
+
+  const handleFollow = async (userId) => {
+    try {
+      console.log("Followed id : ", userId);
+      setFollowing((prev) => !prev);
+      //await toggleFollow(userId);
+    } catch (error) {
+      console.log("Error in toggle follow , Location: Dashboard ", error);
+    }
+  };
 
   if (isLoading) return <UserSkeleton />;
-
-  // if (isLoadingPost) return <PostSkeleton />;
 
   return (
     <div className="h-screen sm:h-full pt-5 ">
@@ -32,7 +70,7 @@ const Dashboard = () => {
             {/* Profile Image */}
             <div className="relative">
               <img
-                src={setuser?.profilepic || "./profile.png"}
+                src={setpostuser?.profilepic || "./profile.png"}
                 alt="Profile"
                 className="w-32 h-32 md:w-40 md:h-40 rounded-full border border-gray-300 object-cover"
               />
@@ -40,56 +78,76 @@ const Dashboard = () => {
 
             {/* Profile Info */}
             <div className="flex flex-col gap-2 pt-5 sm:pt-0">
-              <div className="flex items-center gap-4">
-                <h2 className="text-xl font-semibold">{setuser?.name}</h2>
-                <Link
-                  to={"/profile"}
-                  className={`
-              btn btn-sm gap-2 transition-colors
-              
-              `}
-                >
-                  <span className="inline ">Edit Profile</span>
-                </Link>
-                {/* Modal for create post */}
-                <>
-                  <button
-                    className="btn btn-sm btn-outline"
-                    onClick={() => {
-                      document.getElementById("my_modal_2").showModal();
-                    }}
+              {isOwner ? (
+                <div className="flex items-center gap-4">
+                  <h2 className="text-xl font-semibold">{setpostuser?.name}</h2>
+                  <Link
+                    to={"/profile"}
+                    className="btn btn-sm gap-2 transition-colors"
                   >
-                    <SquarePlus />
-                    create post
-                  </button>
-                  <dialog id="my_modal_2" className="text-black">
-                    <CreatePost />
-                  </dialog>
-                </>
-                <div
-                  className="hidden lg:tooltip tooltip-top"
-                  data-tip="This is Setting Update me"
-                >
-                  <Settings className="size-6 cursor-pointer" />
+                    <span className="inline ">Edit Profile</span>
+                  </Link>
+                  {/* Modal for create post */}
+                  <>
+                    <button
+                      className="btn btn-sm btn-outline"
+                      onClick={() => {
+                        document.getElementById("my_modal_2").showModal();
+                      }}
+                    >
+                      <SquarePlus />
+                      create post
+                    </button>
+
+                    <dialog id="my_modal_2" className="text-black">
+                      <CreatePost />
+                    </dialog>
+                  </>
+                  <div
+                    className="hidden lg:tooltip tooltip-top"
+                    data-tip="This is Setting Update me"
+                  >
+                    <Settings className="size-6 cursor-pointer" />
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <>
+                  {!isOwner && Following ? (
+                    <button
+                      className="btn btn-sm btn-outline bg-gray-400 text-white"
+                      onClick={() => handleFollow(setpostuser?._id)}
+                    >
+                      Following
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn-sm btn-outline bg-red-400 text-white"
+                      onClick={() => handleFollow(setpostuser?._id)}
+                    >
+                      Follow
+                    </button>
+                  )}
+                </>
+              )}
 
               {/* Stats */}
               <div className="flex gap-6 text-sm">
                 <span>
-                  <strong>{setPost?.length ? setPost?.length : 0}</strong> posts
+                  <strong>{setPost?.length}</strong> posts
                 </span>
-             
+
                 <span>
-                  <strong>0</strong> followers
+                  <strong>{setpostuser?.follower?.length}</strong> followers
                 </span>
                 <span>
-                  <strong>0</strong> following
+                  <strong>{setpostuser?.following?.length}</strong> following
                 </span>
               </div>
 
               {/* Name */}
-              <p className="text-md font-semibold">About you</p>
+              <p className="text-md font-semibold">
+                {setpostuser?.about || "About me"}
+              </p>
             </div>
           </div>
           <hr />
@@ -107,43 +165,47 @@ const Dashboard = () => {
               >
                 Posts
               </button>
-              <button
-                className={`pb-2  pt-4 ${
-                  activeTab === "saved"
-                    ? "border-b-2 border-black"
-                    : "opacity-50"
-                }`}
-                onClick={() => setActiveTab("saved")}
-              >
-                Saved
-              </button>
-              <button
-                className={`pb-2  pt-4 ${
-                  activeTab === "liked"
-                    ? "border-b-2 border-black"
-                    : "opacity-50"
-                }`}
-                onClick={() => setActiveTab("liked")}
-              >
-                Liked
-              </button>
+              {isOwner && (
+                <>
+                  <button
+                    className={`pb-2  pt-4 ${
+                      activeTab === "saved"
+                        ? "border-b-2 border-black"
+                        : "opacity-50"
+                    }`}
+                    onClick={() => setActiveTab("saved")}
+                  >
+                    Saved
+                  </button>
+                  <button
+                    className={`pb-2  pt-4 ${
+                      activeTab === "liked"
+                        ? "border-b-2 border-black"
+                        : "opacity-50"
+                    }`}
+                    onClick={() => setActiveTab("liked")}
+                  >
+                    Liked
+                  </button>
+                </>
+              )}
             </div>
-
             {/* Post Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-6 p-4 w-full sm:w-[80%]">
-              {isLoadingPost ? <PostSkeleton /> : ""}
-              {activeTab === "posts" && <UserPost setpost={setPost} />}
-              {activeTab === "saved" && <UserSavedPost />}
-              {activeTab === "liked" && <UserLikedPost />}
-            </div>
+            {setPost?.length > 0 ? (
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-6 p-4 w-full sm:w-[80%]">
+                  {isLoadingPost ? <PostSkeleton /> : ""}
+                  {activeTab === "posts" && <UserPost setpost={setPost} />}
+                  {isOwner && activeTab === "saved" && <UserSavedPost />}
+                  {isOwner && activeTab === "liked" && <UserLikedPost />}
+                </div>
+              </>
+            ) : (
+              <div className="h-[25dvh] flex justify-center m-5 ">
+                <h1>{isOwner ? "You have" : "User has"} 0 post 😢</h1>
+              </div>
+            )}
           </div>
-          {setPost?.length === 0 ? (
-            <div className="h-[25dvh] flex justify-center m-5 ">
-              <h1>You have 0 post 😢</h1>
-            </div>
-          ) : (
-            ""
-          )}
           {/* Everything inside these 3 divs */}
         </div>
       </div>

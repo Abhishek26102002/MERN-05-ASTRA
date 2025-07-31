@@ -5,9 +5,17 @@ import LineChart from "./LineChart";
 const AdminPerformance = () => {
   return (
     <>
-      <div className="flex sm:flex-row flex-col justify-between">
-        <SalesChart />
-        <LineChart />
+      <div className="flex flex-col gap-4">
+        {/* First row with two charts side-by-side */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <SalesChart />
+          <LineChart />
+        </div>
+
+        {/* Second row with one chart */}
+        <div>
+          <PieChart />
+        </div>
       </div>
     </>
   );

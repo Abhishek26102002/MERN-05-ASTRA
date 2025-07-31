@@ -5,10 +5,14 @@ import { NotificationStore } from "../ApiStore/NotificationStore";
 import NotificationsSkeleton from "../components/skeleton/NotificationSkeleton";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
+import PostViewModal from "../components/PostViewModal";
+import { PostStore } from "../ApiStore/PostStore";
 const NotificationPage = () => {
   const { fetchAllNotification, markAsRead, notifications, isLoadingNoti } =
     NotificationStore();
-
+  const { fetchpostbyid } = PostStore();
+  const [showModal, setShowModal] = useState(false);
+  const [currPost, setCurrPost] = useState(null);
   useEffect(() => {
     fetchAllNotification();
   }, []);
@@ -61,7 +65,7 @@ const NotificationPage = () => {
                         <div className="avatar">
                           <div className="w-10 rounded-full">
                             <Link
-                              to={`/singleProfile/${notification?.createdBy?._id}`}
+                              to={`/dashboard/${notification?.createdBy?._id}`}
                             >
                               <img
                                 src={
@@ -79,13 +83,18 @@ const NotificationPage = () => {
                       </div>
                       <p>{notification.content}</p>
                       {notification?.postId?.image && (
-                        <Link to={`/singleblog/${notification?.postId?._id}`}>
+                        <div
+                          onClick={() => {
+                            setCurrPost(notification?.postId);
+                            setShowModal(true);
+                          }}
+                        >
                           <img
                             src={notification?.postId?.image}
                             alt="Post content"
                             className="mt-2 rounded-md w-full max-w-xs h-auto object-cover"
                           />
-                        </Link>
+                        </div>
                       )}
                     </div>
                   )}
@@ -101,6 +110,12 @@ const NotificationPage = () => {
           )}
         </div>
       </div>
+      {showModal && (
+        <PostViewModal
+          post={currPost}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 };

@@ -90,7 +90,7 @@ const AdminUsers = () => {
                 </th>
                 <td>
                   <div className="flex items-center gap-3">
-                    <Link to={`/singleProfile/${user._id}`}>
+                    <Link to={`/dashboard/${user._id}`}>
                       <div className="avatar">
                         <div className="mask mask-squircle h-12 w-12">
                           <img
@@ -139,7 +139,7 @@ const AdminUsers = () => {
                     <Trash2 className="size-4" />
                   </button>
                   <button
-                    onClick={() => navigate(`/singleProfile/${user._id}`)}
+                    onClick={() => navigate(`/dashboard/${user._id}`)}
                     className="btn bg-transparent btn-sm text-sky-300 hover:text-sky-500"
                   >
                     <SquareArrowOutUpRight className="size-4" />

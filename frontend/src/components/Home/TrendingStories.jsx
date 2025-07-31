@@ -24,7 +24,7 @@ const TrendingStories = () => {
                 </h3>
               </Link>
               <div className="flex gap-3 mt-2">
-                <Link to={`/singleProfile/${trend?.createdBy[0]?._id}`}>
+                <Link to={`/dashboard/${trend?.createdBy[0]?._id}`}>
                   <div className="avatar">
                     <div className="w-7 rounded-full">
                       <img
