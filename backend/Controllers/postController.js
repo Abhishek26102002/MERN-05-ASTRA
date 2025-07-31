@@ -53,7 +53,7 @@ export const createPost = asyncHandler(async (req, res) => {
     const newPost = await Blog.create({
       image: uploadResponse.secure_url,
       title,
-      blogText,
+      description: blogText,
       createdBy: userdetails,
       category,
     });
