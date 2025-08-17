@@ -24,7 +24,10 @@ export const validateToken = async (req, res, next) => {
     }
 
     // Find the user by ID
-    const user = await Users.findById(decoded.userId).select("-password");
+    const user = await Users.findById(decoded.userId)
+      .select("-password")
+      .populate("following","name email")
+      .populate("follower","name email");
 
     if (!user) {
       return res

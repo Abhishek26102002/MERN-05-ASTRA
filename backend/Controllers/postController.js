@@ -311,7 +311,7 @@ export const updatePost = asyncHandler(async (req, res) => {
 
     // Update the blog fields
     blog.title = title || blog.title;
-    blog.blogText = blogText || blog.blogText;
+    blog.description = blogText || blog.description;
     blog.category = category || blog.category;
 
     if (uploadResponse) {
