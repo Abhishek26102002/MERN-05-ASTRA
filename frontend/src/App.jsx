@@ -32,8 +32,6 @@ const App = () => {
     setuser;
   }, []);
 
-  // console.log(setuser.is_Admin);
-
   return (
     <div data-theme={theme}>
       {/* Common in all Pages Navbar */}

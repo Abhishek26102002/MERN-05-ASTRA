@@ -21,6 +21,10 @@ const Dashboard = () => {
     setIsFollow,
   } = UserStore();
   const [activeTab, setActiveTab] = useState("posts");
+  // Local state to track follow status
+  const [isUserFollowing, setIsUserFollowing] = useState(false);
+  const [isCheckingFollow, setIsCheckingFollow] = useState(true); // Loading state
+
   const {
     setPost,
     isLoadingPost,
@@ -28,39 +32,55 @@ const Dashboard = () => {
     setpostuser,
     fetchuserbyhisid,
   } = PostStore();
-  const [Following, setFollowing] = useState(false);
 
   useEffect(() => {
     checkAuth();
     setuser;
   }, [id]);
 
-  const isOwner = id === setuser?._id;
+  const isOwner = Boolean(id === setuser?._id);
 
   useEffect(() => {
-    isFollowing(id);
     fetchuserbyhisid(id);
     fetchpostbyuserid(id);
-  }, [Navigate, id]);
+  }, [isOwner, Navigate, id]);
 
-  
   useEffect(() => {
-    setFollowing(setIsFollow);
-  }, [Navigate, id]);
+    let isMounted = true;
 
-  console.log(Following);
+    async function checkFollowStatus() {
+      try {
+        setIsCheckingFollow(true);
+        await isFollowing(id);
+        if (isMounted) {
+          setIsUserFollowing(setIsFollow);
+        }
+      } catch (error) {
+        console.error("Error checking follow status:", error);
+      } finally {
+        if (isMounted) {
+          setIsCheckingFollow(false);
+        }
+      }
+    }
+
+    checkFollowStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id, setIsFollow]);
 
   const handleFollow = async (userId) => {
+    setIsUserFollowing((prev) => !prev);
     try {
-      console.log("Followed id : ", userId);
-      setFollowing((prev) => !prev);
-      //await toggleFollow(userId);
+      await toggleFollow(userId);
     } catch (error) {
       console.log("Error in toggle follow , Location: Dashboard ", error);
     }
   };
 
-  if (isLoading) return <UserSkeleton />;
+  if (isLoading || isCheckingFollow) return <UserSkeleton />;
 
   return (
     <div className="h-screen sm:h-full pt-5 ">
@@ -112,7 +132,7 @@ const Dashboard = () => {
                 </div>
               ) : (
                 <>
-                  {!isOwner && Following ? (
+                  {isUserFollowing ? (
                     <button
                       className="btn btn-sm btn-outline bg-gray-400 text-white"
                       onClick={() => handleFollow(setpostuser?._id)}

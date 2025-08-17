@@ -73,9 +73,7 @@ const UpdatePost = (post) => {
     try {
       await updatePost(formData, post.post._id);
       // Close modal after successful submission
-      document.getElementById("my_modal_4").close();
-      // navigate(0); // Refreshes the current page
-      // toast.success("Refresh page to view update")
+      document.getElementById(`modal_${post.post._id}`).close();
     } catch (error) {
       console.log("Error in create post:", error);
     }
